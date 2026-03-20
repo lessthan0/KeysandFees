@@ -31,5 +31,5 @@ app.use(
 // Register your routes below this line
 app.use(express.json());
 app.listen(process.env.PORT, () => {
-  console.log(`Server listening on http://localhost:${process.env.PORT}`);
+  console.log(`Server listening on http://localhost:${PORT}`);
 });

@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import { addProperty } from '../models/PropertyModels.js';
 //import { parseDatabaseError } from '../utils/db-utils.js';
+import { PropertyStatus } from '../entities/Properties.js';
 import { PropertySchema } from '../validators/propertyValidators.js';
 
 export async function registerProperty(req: Request, res: Response): Promise<void> {
@@ -13,7 +14,8 @@ export async function registerProperty(req: Request, res: Response): Promise<voi
   }
 
   const { address, status, bedrooms, yearbuilt } = result.data;
-  const newProperty = await addProperty(address, bedrooms, yearbuilt, status);
+  const stat = status as PropertyStatus;
+  const newProperty = await addProperty(address, bedrooms, yearbuilt, stat);
 
   res.status(201).json({ property: newProperty });
 }
