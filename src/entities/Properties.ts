@@ -1,16 +1,28 @@
-import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
+import { Lease } from './Lease.js';
+import { User } from './User.js';
+
 export enum PropertyStatus {
   VACANT = 'vacant',
   OCCUPIED = 'occupied',
 }
 @Entity()
 export class Property {
-  @PrimaryColumn()
-  address: string;
-
-  @PrimaryColumn({ unique: true })
+  @PrimaryColumn({ type: 'varchar' })
   propertyId: string;
+
+  @Column({ type: 'varchar' })
+  address: string;
 
   @BeforeInsert()
   generateId(): void {
@@ -20,7 +32,6 @@ export class Property {
   @Column({
     type: 'enum',
     enum: PropertyStatus,
-
     default: 'vacant',
   })
   status: PropertyStatus;
@@ -29,4 +40,25 @@ export class Property {
 
   @Column('int')
   yearbuilt: number;
+
+  @Column('int')
+  monthsRent: number;
+
+  @Column({ type: 'text', nullable: true })
+  imageUrl!: string | null;
+
+  @ManyToOne(() => User, (user) => user.properties, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  owner!: User;
+
+  @OneToMany(() => Lease, (lease) => lease.property)
+  leases!: Lease[];
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }

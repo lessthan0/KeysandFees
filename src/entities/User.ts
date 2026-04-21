@@ -1,5 +1,14 @@
-import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
+import { Property } from './Properties.js';
 
 @Entity()
 export class User {
@@ -19,4 +28,16 @@ export class User {
 
   @Column({ default: false })
   verifiedEmail: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  displayName!: string | null;
+
+  @OneToMany(() => Property, (property) => property.owner)
+  properties!: Property[];
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }
