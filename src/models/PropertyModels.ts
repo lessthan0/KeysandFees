@@ -16,7 +16,16 @@ async function getPropertyForUser(userId: string, propertyId: string): Promise<P
     },
   });
 }
-
+async function getPropertiesForUser(userId: string): Promise<Property[]> {
+  return await propertyRepository.find({
+    where: {
+      owner: { userId },
+    },
+    relations: {
+      leases: true,
+    },
+  });
+}
 async function addProperty(
   address: string,
   bedrooms: number,
@@ -85,4 +94,15 @@ async function updateProperty(
   return await propertyRepo.save(property);
 }
 
-export { addProperty, getPropertyForUser, updateProperty };
+async function deleteProperty(userId: string, propertyId: string): Promise<boolean> {
+  const property = await getPropertyForUser(userId, propertyId);
+  const propertyRepo = AppDataSource.getRepository(Property);
+  if (!property) {
+    return false;
+  }
+
+  await propertyRepo.remove(property);
+  return true;
+}
+
+export { addProperty, deleteProperty, getPropertiesForUser, getPropertyForUser, updateProperty };

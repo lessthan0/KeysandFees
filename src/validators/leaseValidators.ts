@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createLeaseSchema = z
+export const CreateLeaseSchema = z
   .object({
     tenantId: z.number().int().positive(),
     startDate: z.coerce.date(),
@@ -12,4 +12,7 @@ export const createLeaseSchema = z
     path: ['endDate'],
   });
 
-export const updateLeaseSchema = createLeaseSchema.partial();
+export const UpdateLeaseSchema = CreateLeaseSchema.partial();
+
+export type CreateLeaseData = z.infer<typeof CreateLeaseSchema>;
+export type UpdateLeaseData = z.infer<typeof UpdateLeaseSchema>;

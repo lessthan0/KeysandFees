@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -33,7 +34,7 @@ export class Lease {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  property!: Property;
+  property!: Relation<Property>;
 
   @ManyToOne(() => Tenant, (tenant) => tenant.leases, {
     nullable: false,

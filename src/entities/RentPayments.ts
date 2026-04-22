@@ -1,4 +1,4 @@
-import { BeforeInsert, Column, Entity, ManyToOne, PrimaryColumn, Unique } from 'typeorm';
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryColumn, Relation, Unique } from 'typeorm';
 
 import { v7 as uuidv7 } from 'uuid';
 import { Lease } from './Lease.js';
@@ -17,7 +17,7 @@ export class RentPayment {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  lease!: Lease;
+  lease!: Relation<Lease>;
 
   @Column({ type: 'varchar', length: 7 })
   rentMonth!: string;

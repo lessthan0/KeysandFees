@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
@@ -54,7 +55,7 @@ export class Property {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  owner!: User;
+  owner!: Relation<User>;
 
   @OneToMany(() => Lease, (lease) => lease.property)
   leases!: Lease[];

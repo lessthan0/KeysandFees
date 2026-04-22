@@ -1,18 +1,18 @@
 import { AppDataSource } from '../dataSource.js';
 import { User } from '../entities/User.js';
 
-const userRepository = AppDataSource.getRepository(User);
+const UserRepository = AppDataSource.getRepository(User);
 
 async function getAllUsers(): Promise<User[]> {
-  return userRepository.find();
+  return UserRepository.find();
 }
 
 async function getUserById(userId: string): Promise<User | null> {
-  return userRepository.findOne({ where: { userId } });
+  return UserRepository.findOne({ where: { userId } });
 }
 
 async function getUserByEmail(email: string): Promise<User | null> {
-  return userRepository.findOne({ where: { email } });
+  return UserRepository.findOne({ where: { email } });
 }
 
 async function addUser(email: string, passwordHash: string): Promise<User> {
@@ -21,6 +21,6 @@ async function addUser(email: string, passwordHash: string): Promise<User> {
   newUser.passwordHash = passwordHash;
   // userId is generated automatically by @BeforeInsert
 
-  return userRepository.save(newUser);
+  return UserRepository.save(newUser);
 }
-export { addUser, getAllUsers, getUserByEmail, getUserById, userRepository };
+export { addUser, getAllUsers, getUserByEmail, getUserById, UserRepository };

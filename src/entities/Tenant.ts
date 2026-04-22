@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -14,7 +15,7 @@ import { User } from './User.js';
 @Entity('tenants')
 export class Tenant {
   @PrimaryGeneratedColumn()
-  id!: number;
+  tenantId!: string;
 
   @Column({ type: 'varchar', length: 80 })
   firstName!: string;
@@ -47,5 +48,5 @@ export class Tenant {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  owner!: User;
+  owner!: Relation<User>;
 }
