@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
 import { Property } from './Properties.js';
+import { Tenant } from './Tenant.js';
 
 @Entity()
 export class User {
@@ -40,4 +41,7 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @OneToMany(() => Tenant, (tenant) => tenant.owner)
+  tenants!: Tenant[];
 }

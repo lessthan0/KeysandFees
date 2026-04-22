@@ -23,5 +23,5 @@ export class RentPayment {
   rentMonth!: string;
 
   @Column('int')
-  amountPaidCents!: number;
+  rentAmountPaid!: number;
 }

@@ -23,4 +23,4 @@ async function addUser(email: string, passwordHash: string): Promise<User> {
 
   return userRepository.save(newUser);
 }
-export { addUser, getAllUsers, getUserByEmail, getUserById };
+export { addUser, getAllUsers, getUserByEmail, getUserById, userRepository };

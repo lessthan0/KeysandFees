@@ -44,6 +44,9 @@ export class Property {
   @Column('int')
   monthsRent: number;
 
+  @Column({ type: 'int' })
+  rentAmount!: number;
+
   @Column({ type: 'text', nullable: true })
   imageUrl!: string | null;
 

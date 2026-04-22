@@ -2,12 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Lease } from './Lease.js';
+import { User } from './User.js';
 
 @Entity('tenants')
 export class Tenant {
@@ -40,4 +42,10 @@ export class Tenant {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @ManyToOne(() => User, (user: { tenants: string }) => user.tenants, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  owner!: User;
 }

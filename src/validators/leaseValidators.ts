@@ -11,3 +11,5 @@ export const createLeaseSchema = z
     message: 'Lease end date occurs after start.',
     path: ['endDate'],
   });
+
+export const updateLeaseSchema = createLeaseSchema.partial();

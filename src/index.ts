@@ -4,7 +4,12 @@ import express, { Express } from 'express';
 import session from 'express-session';
 import './config.js'; // do not remove this line
 import { sessionMiddleware } from './sessionConfig.js';
-
+//import { RegistrationSchema } from './authValidator.ts';
+//import { CreateLeaseSchema, UpdateLeaseSchema } from './validators/leaseValidators.js';
+//import { CreatePropertySchema } from './validators/propertyValidators.js';
+//import { CreateRentPaymentSchema } from './validators/rentPaymentValidator.js';
+//import { CreateTenantSchema } from './validators/tenantValidator.js';
+import { logIn, registerUser } from './controllers/UserController.js';
 const app: Express = express();
 const { PORT, COOKIE_SECRET } = process.env;
 const PostgresStore = connectPgSimple(session);
@@ -29,7 +34,10 @@ app.use(
 );
 // -- Routes --------------------------------------------------
 // Register your routes below this line
-app.use(express.json());
+
 app.listen(process.env.PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
+//user stuffs
+app.post('/register', registerUser);
+app.post('/login', logIn);
