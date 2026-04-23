@@ -18,6 +18,7 @@ import { Tenant } from './Tenant.js';
 export enum LeaseStatus {
   LEASED = 'leased',
   UNLEASED = 'unleased',
+  ACTIVE = 'active',
 }
 
 @Entity()
@@ -42,10 +43,10 @@ export class Lease {
   tenant!: Tenant;
 
   @Column({ type: 'date' })
-  startDate!: string;
+  startDate!: Date;
 
   @Column({ type: 'date' })
-  endDate!: string;
+  endDate!: Date;
 
   @Column('int')
   monthlyRentCents!: number;

@@ -2,10 +2,10 @@ import { z } from 'zod';
 import { AppDataSource } from '../dataSource.js';
 import { Property, PropertyStatus } from '../entities/Properties.js';
 import { UpdatePropertySchema } from '../validators/propertyValidators.js';
-const propertyRepository = AppDataSource.getRepository(Property);
+const PropertyRepository = AppDataSource.getRepository(Property);
 
 async function getPropertyForUser(userId: string, propertyId: string): Promise<Property | null> {
-  return await propertyRepository.findOne({
+  return await PropertyRepository.findOne({
     where: {
       propertyId,
       owner: { userId },
@@ -17,7 +17,7 @@ async function getPropertyForUser(userId: string, propertyId: string): Promise<P
   });
 }
 async function getPropertiesForUser(userId: string): Promise<Property[]> {
-  return await propertyRepository.find({
+  return await PropertyRepository.find({
     where: {
       owner: { userId },
     },
@@ -43,7 +43,7 @@ async function addProperty(
   newProperty.imageUrl = imageUrl;
   // userId is generated automatically by @BeforeInsert
 
-  return propertyRepository.save(newProperty);
+  return PropertyRepository.save(newProperty);
 }
 
 async function updateProperty(
@@ -51,7 +51,8 @@ async function updateProperty(
   propertyId: string,
   data: z.infer<typeof UpdatePropertySchema>,
 ): Promise<Property | null> {
-  const propertyRepo = AppDataSource.getRepository(Property);
+  const propertyRepo = PropertyRepository;
+  //AppDataSource.getRepository(Property);
 
   const property = await propertyRepo.findOne({
     where: {
@@ -96,7 +97,8 @@ async function updateProperty(
 
 async function deleteProperty(userId: string, propertyId: string): Promise<boolean> {
   const property = await getPropertyForUser(userId, propertyId);
-  const propertyRepo = AppDataSource.getRepository(Property);
+  const propertyRepo = PropertyRepository;
+  //AppDataSource.getRepository(Property);
   if (!property) {
     return false;
   }
@@ -105,4 +107,11 @@ async function deleteProperty(userId: string, propertyId: string): Promise<boole
   return true;
 }
 
-export { addProperty, deleteProperty, getPropertiesForUser, getPropertyForUser, updateProperty };
+export {
+  addProperty,
+  deleteProperty,
+  getPropertiesForUser,
+  getPropertyForUser,
+  PropertyRepository,
+  updateProperty,
+};

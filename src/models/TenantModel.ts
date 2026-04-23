@@ -104,4 +104,11 @@ async function deleteTenant(userId: string, tenantId: string): Promise<boolean> 
   return true;
 }
 
-export { createTenant, deleteTenant, getTenantForUser, getTenantsForUser, updateTenant };
+export {
+  createTenant,
+  deleteTenant,
+  getTenantForUser,
+  getTenantsForUser,
+  TenantRepository,
+  updateTenant,
+};
