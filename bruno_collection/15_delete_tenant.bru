@@ -1,0 +1,13 @@
+meta {
+  name: Delete Tenant
+  type: http
+  seq: 15
+}
+
+delete {
+  url: {{baseUrl}}/tenants/{{tenantId}}
+}
+
+assert {
+  res.status: eq 204
+}

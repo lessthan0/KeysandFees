@@ -1,0 +1,13 @@
+meta {
+  name: Delete Property
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/properties/{{propertyId}}
+}
+
+assert {
+  res.status: eq 204
+}

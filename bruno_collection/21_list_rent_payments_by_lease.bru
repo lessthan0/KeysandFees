@@ -1,0 +1,13 @@
+meta {
+  name: List Rent Payments For Lease
+  type: http
+  seq: 21
+}
+
+get {
+  url: {{baseUrl}}/leases/{{leaseId}}/payments
+}
+
+assert {
+  res.status: eq 200
+}

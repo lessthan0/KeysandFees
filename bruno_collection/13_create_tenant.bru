@@ -1,0 +1,25 @@
+meta {
+  name: Create Tenant
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/tenants
+  body: json
+}
+
+body:json {
+  {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "jane@example.com",
+    "phone": "555-123-4567",
+    "maritalStatus": "single",
+    "notes": "Pays on time"
+  }
+}
+
+assert {
+  res.status: eq 201
+}

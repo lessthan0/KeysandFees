@@ -1,0 +1,22 @@
+meta {
+  name: Update Rent Payment
+  type: http
+  seq: 24
+}
+
+put {
+  url: {{baseUrl}}/payments/{{paymentId}}
+  body: json
+}
+
+body:json {
+  {
+    "rentAmountPaid": 1200,
+    "late": true,
+    "notes": "Marked late after grace period"
+  }
+}
+
+assert {
+  res.status: eq 200
+}

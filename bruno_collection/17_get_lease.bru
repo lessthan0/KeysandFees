@@ -1,0 +1,13 @@
+meta {
+  name: Get Lease
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/leases/{{leaseId}}
+}
+
+assert {
+  res.status: eq 200
+}

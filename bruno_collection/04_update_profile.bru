@@ -1,0 +1,21 @@
+meta {
+  name: Update Profile
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/profile
+  body: json
+}
+
+body:json {
+  {
+    "displayName": "Chase",
+    "email": "test@example.com"
+  }
+}
+
+assert {
+  res.status: eq 200
+}

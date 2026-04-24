@@ -1,0 +1,21 @@
+meta {
+  name: Update Tenant
+  type: http
+  seq: 14
+}
+
+put {
+  url: {{baseUrl}}/tenants/{{tenantId}}
+  body: json
+}
+
+body:json {
+  {
+    "phone": "555-999-9999",
+    "notes": "Updated contact info"
+  }
+}
+
+assert {
+  res.status: eq 200
+}

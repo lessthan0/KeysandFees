@@ -1,0 +1,13 @@
+meta {
+  name: Get Property
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/properties/{{propertyId}}
+}
+
+assert {
+  res.status: eq 200
+}
