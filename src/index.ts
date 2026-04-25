@@ -9,7 +9,13 @@ import { sessionMiddleware } from './sessionConfig.js';
 //import { CreatePropertySchema } from './validators/propertyValidators.js';
 //import { CreateRentPaymentSchema } from './validators/rentPaymentValidator.js';
 //import { CreateTenantSchema } from './validators/tenantValidator.js';
-import { logIn, registerUser } from './controllers/UserController.js';
+import {
+  deleteProfile,
+  getProfile,
+  logIn,
+  registerUser,
+  updateProfile,
+} from './controllers/UserController.js';
 const app: Express = express();
 const { PORT, COOKIE_SECRET } = process.env;
 const PostgresStore = connectPgSimple(session);
@@ -35,9 +41,73 @@ app.use(
 // -- Routes --------------------------------------------------
 // Register your routes below this line
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+//test
+app.get('/', (req, res) => {
+  res.send('API is running');
 });
+
 //user stuffs
 app.post('/register', registerUser);
 app.post('/login', logIn);
+app.get('/profile', getProfile);
+app.put('/profile', updateProfile);
+app.delete('/profile', deleteProfile);
+//properties
+import {
+  editProperty,
+  getProperties,
+  getProperty,
+  registerProperty,
+  removeProperty,
+} from './controllers/PropertyController.js';
+app.get('/properties', getProperties);
+app.get('/properties/:propertyId', getProperty);
+app.post('/properties', registerProperty);
+app.put('/properties/:propertyId', editProperty);
+app.delete('/properties/:propertyId', removeProperty);
+
+//muh tenants
+import {
+  addTenant,
+  editTenant,
+  getTenant,
+  getTenants,
+  removeTenant,
+} from './controllers/TenantController.js';
+app.get('/tenants', getTenants);
+app.get('/tenants/:tenantId', getTenant);
+app.post('/tenants', addTenant);
+app.put('/tenants/:tenantId', editTenant);
+app.delete('/tenants/:tenantId', removeTenant);
+
+//muh leases
+import {
+  addLease,
+  editLease,
+  getLease,
+  listLeasesForProperty,
+  removeLease,
+} from './controllers/LeaseController.js';
+
+app.get('/properties/:propertyId/leases', listLeasesForProperty);
+app.get('/leases/:leaseId', getLease);
+app.post('/properties/:propertyId/leases', addLease);
+app.put('/leases/:leaseId', editLease);
+app.delete('/leases/:leaseId', removeLease);
+
+//rent payment
+import {
+  addRentPayment,
+  editRentPayment,
+  getRentPayment,
+  listRentPayments,
+} from './controllers/RentPaymentController.js';
+
+app.get('/leases/:leaseId/payments', listRentPayments);
+app.get('/payments/:paymentId', getRentPayment);
+app.post('/leases/:leaseId/payments', addRentPayment);
+app.put('/payments/:paymentId', editRentPayment);
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server listening on http://localhost:${PORT}`);
+});

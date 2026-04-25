@@ -1,4 +1,13 @@
-import { BeforeInsert, Column, Entity, ManyToOne, PrimaryColumn, Relation, Unique } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryColumn,
+  Relation,
+  Unique,
+} from 'typeorm';
 
 import { v7 as uuidv7 } from 'uuid';
 import { Lease } from './Lease.js';
@@ -23,5 +32,14 @@ export class RentPayment {
   rentMonth!: string;
 
   @Column('int')
-  rentAmountPaid!: number;
+  rentAmount!: number;
+
+  @CreateDateColumn()
+  paidAt!: Date;
+
+  @Column({ type: 'boolean' })
+  late!: boolean | false;
+
+  @Column({ type: 'text', nullable: true })
+  notes!: string | null;
 }

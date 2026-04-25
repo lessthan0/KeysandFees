@@ -1,7 +1,7 @@
 meta {
   name: Create Rent Payment
   type: http
-  seq: 23
+  seq: 12
 }
 
 post {
@@ -17,6 +17,10 @@ body:json {
     "late": false,
     "notes": "Paid in full"
   }
+}
+
+script:post-response {
+  bru.setVar("paymentId", res.body.paymentId);
 }
 
 assert {

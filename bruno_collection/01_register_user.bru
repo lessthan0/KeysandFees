@@ -11,11 +11,12 @@ post {
 
 body:json {
   {
-    "email": "test@example.com",
-    "password": "Password123!"
+    "email": "{{userEmail}}",
+    "password": "{{userPassword}}"
   }
 }
 
 assert {
   res.status: eq 201
 }
+
