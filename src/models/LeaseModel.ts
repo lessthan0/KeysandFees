@@ -5,7 +5,7 @@ import { PropertyStatus } from '../entities/Properties.js';
 import { PropertyRepository } from '../models/PropertyModels.js';
 import { TenantRepository } from '../models/TenantModel.js';
 import { CreateLeaseSchema, UpdateLeaseSchema } from '../validators/leaseValidators.js';
-const LeaseRepository = AppDataSource.getRepository(Lease);
+export const LeaseRepository = AppDataSource.getRepository(Lease);
 
 async function getLeasesForUserProperty(userId: string, propertyId: string): Promise<Lease[]> {
   return await LeaseRepository.find({
@@ -22,7 +22,32 @@ async function getLeasesForUserProperty(userId: string, propertyId: string): Pro
     },
   });
 }
+async function getLeaseById(userId: string, leaseId: string): Promise<Lease | null> {
+  try {
+    const lease = await LeaseRepository.findOne({
+      where: {
+        leaseId,
+        property: {
+          owner: { userId },
+        },
+      },
+      relations: {
+        property: {
+          owner: true,
+        },
+        tenant: {
+          owner: true,
+        },
+        payments: true,
+      },
+    });
 
+    return lease;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
 async function getLeaseForUser(userId: string, leaseId: string): Promise<Lease | null> {
   return await LeaseRepository.findOne({
     where: {
@@ -78,7 +103,7 @@ async function createLease(
     tenant,
     startDate: data.startDate,
     endDate: data.endDate,
-    monthlyRentCents: data.rentAmount,
+    rentAmount: data.rentAmount,
     status: LeaseStatus.ACTIVE,
     endedAt: null,
   });
@@ -110,7 +135,7 @@ async function updateLease(
   }
 
   if (data.rentAmount !== undefined) {
-    lease.monthlyRentCents = data.rentAmount;
+    lease.rentAmount = data.rentAmount;
   }
 
   return await LeaseRepository.save(lease);
@@ -132,4 +157,11 @@ async function endLeaseForUser(userId: string, leaseId: string): Promise<Lease |
   return await LeaseRepository.save(lease);
 }
 
-export { createLease, endLeaseForUser, getLeaseForUser, getLeasesForUserProperty, updateLease };
+export {
+  createLease,
+  endLeaseForUser,
+  getLeaseById,
+  getLeaseForUser,
+  getLeasesForUserProperty,
+  updateLease,
+};

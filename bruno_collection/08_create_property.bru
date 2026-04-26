@@ -1,7 +1,7 @@
 meta {
   name: Create Property
   type: http
-  seq: 8
+  seq: 3
 }
 
 post {
@@ -18,6 +18,10 @@ body:json {
     "yearbuilt": 2005,
     "imageUrl": "https://example.com/property.jpg"
   }
+}
+
+script:post-response {
+  bru.setVar("propertyId", res.body.propertyId);
 }
 
 assert {

@@ -52,7 +52,6 @@ async function updateProperty(
   data: z.infer<typeof UpdatePropertySchema>,
 ): Promise<Property | null> {
   const propertyRepo = PropertyRepository;
-  //AppDataSource.getRepository(Property);
 
   const property = await propertyRepo.findOne({
     where: {

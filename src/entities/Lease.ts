@@ -49,7 +49,7 @@ export class Lease {
   endDate!: Date;
 
   @Column('int')
-  monthlyRentCents!: number;
+  rentAmount!: number;
 
   @Column({
     type: 'enum',

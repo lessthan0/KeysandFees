@@ -1,8 +1,14 @@
 import argon2 from 'argon2';
 import { Request, Response } from 'express';
-import { addUser, getUserByEmail } from '../models/UserModel.js';
+import {
+  addUser,
+  deleteUser,
+  getUserByEmail,
+  getUserProfile,
+  updateUserProfile,
+} from '../models/UserModel.js';
 import { parseDatabaseError } from '../utils/db-utils.js';
-import { RegistrationSchema } from '../validators/authValidator.js';
+import { RegistrationSchema, UpdateProfileSchema } from '../validators/authValidator.js';
 
 async function registerUser(req: Request, res: Response): Promise<void> {
   const result = RegistrationSchema.safeParse(req.body);
@@ -62,4 +68,96 @@ async function logIn(req: Request, res: Response): Promise<void> {
   }
 }
 
-export { logIn, registerUser };
+async function getProfile(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.session.authenticatedUser?.userId;
+
+    if (!userId) {
+      return;
+    }
+
+    const profile = await getUserProfile(userId);
+
+    if (!profile) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.status(200).json(profile);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+}
+async function updateProfile(req: Request, res: Response): Promise<void> {
+  const result = UpdateProfileSchema.safeParse(req.body);
+
+  if (!result.success) {
+    res.status(400).json(result.error.flatten());
+    return;
+  }
+
+  try {
+    const userId = req.session.authenticatedUser?.userId;
+
+    if (!userId) {
+      return;
+    }
+
+    const updateData: {
+      email?: string;
+      displayName?: string | null;
+      passwordHash?: string;
+    } = {};
+
+    if (result.data.email !== undefined) {
+      updateData.email = result.data.email;
+    }
+
+    if (result.data.displayName !== undefined) {
+      updateData.displayName = result.data.displayName;
+    }
+
+    if (result.data.password !== undefined) {
+      updateData.passwordHash = await argon2.hash(result.data.password);
+    }
+
+    const updatedUser = await updateUserProfile(userId, updateData);
+
+    if (!updatedUser) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+}
+
+async function deleteProfile(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.session.authenticatedUser?.userId;
+
+    if (!userId) {
+      return;
+    }
+
+    const deleted = await deleteUser(userId);
+
+    if (!deleted) {
+      res.sendStatus(404);
+      return;
+    }
+
+    await req.session.clearSession();
+
+    res.sendStatus(204);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+}
+
+export { deleteProfile, getProfile, logIn, registerUser, updateProfile };
