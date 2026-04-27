@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { AppDataSource } from '../dataSource.js';
 import { Tenant } from '../entities/Tenant.js';
-import { UpdateTenantSchema } from '../validators/tenantValidator.js';
-import { UserRepository } from './UserModel.js';
-const TenantRepository = AppDataSource.getRepository(Tenant);
+import { User } from '../entities/User.js';
+import { CreateTenantSchema, UpdateTenantSchema } from '../validators/tenantValidator.js';
 
+const TenantRepository = AppDataSource.getRepository(Tenant);
+const UserRepository = AppDataSource.getRepository(User);
 async function getTenantsForUser(userId: string): Promise<Tenant[]> {
   return await TenantRepository.find({
     where: {
@@ -31,12 +32,7 @@ async function getTenantForUser(userId: string, tenantId: string): Promise<Tenan
 
 async function createTenant(
   userId: string,
-  firstname: string,
-  lastname: string,
-  email?: string | null,
-  phone?: string | null,
-  maritalstatus?: string | null,
-  notes?: string | null,
+  data: z.infer<typeof CreateTenantSchema>,
 ): Promise<Tenant | null> {
   const owner = await UserRepository.findOneBy({ userId });
 
@@ -44,13 +40,15 @@ async function createTenant(
     return null;
   }
 
-  const tenant = new Tenant();
-  tenant.firstName = firstname;
-  tenant.lastName = lastname;
-  tenant.email = email;
-  tenant.phone = phone;
-  tenant.maritalStatus = maritalstatus;
-  tenant.notes = notes;
+  const tenant = TenantRepository.create({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email ?? null,
+    phone: data.phone ?? null,
+    maritalStatus: data.maritalStatus ?? null,
+    notes: data.notes ?? null,
+    owner,
+  });
 
   return await TenantRepository.save(tenant);
 }
@@ -75,19 +73,19 @@ async function updateTenant(
   }
 
   if (data.email !== undefined) {
-    tenant.email = data.email;
+    tenant.email = data.email ?? null;
   }
 
   if (data.phone !== undefined) {
-    tenant.phone = data.phone;
+    tenant.phone = data.phone ?? null;
   }
 
   if (data.maritalStatus !== undefined) {
-    tenant.maritalStatus = data.maritalStatus;
+    tenant.maritalStatus = data.maritalStatus ?? null;
   }
 
   if (data.notes !== undefined) {
-    tenant.notes = data.notes;
+    tenant.notes = data.notes ?? null;
   }
 
   return await TenantRepository.save(tenant);
@@ -104,11 +102,4 @@ async function deleteTenant(userId: string, tenantId: string): Promise<boolean> 
   return true;
 }
 
-export {
-  createTenant,
-  deleteTenant,
-  getTenantForUser,
-  getTenantsForUser,
-  TenantRepository,
-  updateTenant,
-};
+export { createTenant, deleteTenant, getTenantForUser, getTenantsForUser, updateTenant };

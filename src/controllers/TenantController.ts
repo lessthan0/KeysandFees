@@ -20,7 +20,6 @@ export async function getTenants(req: Request, res: Response): Promise<void> {
     }
 
     const tenants = await getTenantsForUser(userId);
-
     res.status(200).json(tenants);
   } catch (err) {
     console.error(err);
@@ -57,7 +56,7 @@ export async function addTenant(req: Request, res: Response): Promise<void> {
   const result = CreateTenantSchema.safeParse(req.body);
 
   if (!result.success) {
-    res.sendStatus(400);
+    res.status(400).json(result.error.flatten());
     return;
   }
 
@@ -69,19 +68,13 @@ export async function addTenant(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const tenant = await createTenant(
-      result.data.firstName,
-      result.data.lastName,
-      result.data.email,
-      result.data.maritalStatus,
-      result.data.notes,
-    );
+    const tenant = await createTenant(userId, result.data);
 
     if (!tenant) {
-      res.sendStatus(404);
+      res.status(404).json({ message: 'Owner not found' });
       return;
     }
-    //print out the tenant, the david tenant
+
     res.status(201).json(tenant);
   } catch (err) {
     console.error(err);
@@ -93,7 +86,7 @@ export async function editTenant(req: Request, res: Response): Promise<void> {
   const result = UpdateTenantSchema.safeParse(req.body);
 
   if (!result.success) {
-    res.sendStatus(400);
+    res.status(400).json(result.error.flatten());
     return;
   }
 
@@ -101,6 +94,7 @@ export async function editTenant(req: Request, res: Response): Promise<void> {
     const userId = req.session.authenticatedUser?.userId;
 
     if (!userId) {
+      res.sendStatus(401);
       return;
     }
 
@@ -119,11 +113,13 @@ export async function editTenant(req: Request, res: Response): Promise<void> {
     res.sendStatus(500);
   }
 }
+
 export async function removeTenant(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.session.authenticatedUser?.userId;
 
     if (!userId) {
+      res.sendStatus(401);
       return;
     }
 

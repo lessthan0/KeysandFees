@@ -73,6 +73,7 @@ async function getProfile(req: Request, res: Response): Promise<void> {
     const userId = req.session.authenticatedUser?.userId;
 
     if (!userId) {
+      res.sendStatus(404);
       return;
     }
 
@@ -101,6 +102,7 @@ async function updateProfile(req: Request, res: Response): Promise<void> {
     const userId = req.session.authenticatedUser?.userId;
 
     if (!userId) {
+      res.status(400).json(result.error);
       return;
     }
 

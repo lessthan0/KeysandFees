@@ -1,11 +1,14 @@
 import { z } from 'zod';
 import { AppDataSource } from '../dataSource.js';
 import { Lease, LeaseStatus } from '../entities/Lease.js';
-import { PropertyStatus } from '../entities/Properties.js';
-import { PropertyRepository } from '../models/PropertyModels.js';
-import { TenantRepository } from '../models/TenantModel.js';
+import { Property, PropertyStatus } from '../entities/Properties.js';
+import { Tenant } from '../entities/Tenant.js';
+
 import { CreateLeaseSchema, UpdateLeaseSchema } from '../validators/leaseValidators.js';
-export const LeaseRepository = AppDataSource.getRepository(Lease);
+
+const LeaseRepository = AppDataSource.getRepository(Lease);
+const PropertyRepository = AppDataSource.getRepository(Property);
+const TenantRepository = AppDataSource.getRepository(Tenant);
 
 async function getLeasesForUserProperty(userId: string, propertyId: string): Promise<Lease[]> {
   return await LeaseRepository.find({
@@ -86,7 +89,7 @@ async function createLease(
 
   const tenant = await TenantRepository.findOne({
     where: {
-      tenantId: String(data.tenantId),
+      tenantId: data.tenantId,
       owner: { userId },
     },
     relations: {

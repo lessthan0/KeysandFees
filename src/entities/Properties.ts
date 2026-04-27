@@ -42,9 +42,6 @@ export class Property {
   @Column('int')
   yearbuilt: number;
 
-  @Column('int')
-  monthsRent: number;
-
   @Column({ type: 'int' })
   rentAmount!: number;
 

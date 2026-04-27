@@ -1,4 +1,5 @@
 import connectPgSimple from 'connect-pg-simple';
+import { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -25,4 +26,13 @@ const sessionMiddleware = session({
   saveUninitialized: false, // Don't save empty sessions (no cookie until session is used)
 });
 
-export { sessionMiddleware };
+function requireAuth(req: Request, res: Response, next: NextFunction): void {
+  if (!req.session.authenticatedUser?.userId) {
+    res.sendStatus(401);
+    return;
+  }
+
+  next();
+}
+
+export { requireAuth, sessionMiddleware };

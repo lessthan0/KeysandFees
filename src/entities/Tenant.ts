@@ -1,22 +1,29 @@
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Relation,
   UpdateDateColumn,
 } from 'typeorm';
 
+import { v7 as uuidv7 } from 'uuid';
 import { Lease } from './Lease.js';
 import { User } from './User.js';
-
 @Entity('tenants')
 export class Tenant {
-  @PrimaryGeneratedColumn()
+  // @PrimaryGeneratedColumn()
+  //tenantId!: string;
+  @PrimaryColumn({ type: 'varchar' })
   tenantId!: string;
 
+  @BeforeInsert()
+  generateId(): void {
+    this.tenantId = uuidv7();
+  }
   @Column({ type: 'varchar', length: 80 })
   firstName!: string;
 

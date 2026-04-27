@@ -78,5 +78,4 @@ export {
   getUserById,
   getUserProfile,
   updateUserProfile,
-  UserRepository,
 };

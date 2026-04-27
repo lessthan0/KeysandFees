@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import { AppDataSource } from '../dataSource.js';
+import { Lease } from '../entities/Lease.js';
 import { RentPayment } from '../entities/RentPayments.js';
-import { LeaseRepository } from '../models/LeaseModel.js';
 import {
   CreateRentPaymentSchema,
   UpdateRentPaymentSchema,
 } from '../validators/rentPaymentValidator.js';
 
+const LeaseRepository = AppDataSource.getRepository(Lease);
 const PaymentRepository = AppDataSource.getRepository(RentPayment);
 
 async function getPaymentsForLease(userId: string, leaseId: string): Promise<RentPayment[]> {

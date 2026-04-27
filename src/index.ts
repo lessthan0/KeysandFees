@@ -1,9 +1,7 @@
-import connectPgSimple from 'connect-pg-simple';
 import 'dotenv/config';
 import express, { Express } from 'express';
-import session from 'express-session';
 import './config.js'; // do not remove this line
-import { sessionMiddleware } from './sessionConfig.js';
+import { requireAuth } from './sessionConfig.js';
 //import { RegistrationSchema } from './authValidator.ts';
 //import { CreateLeaseSchema, UpdateLeaseSchema } from './validators/leaseValidators.js';
 //import { CreatePropertySchema } from './validators/propertyValidators.js';
@@ -17,8 +15,8 @@ import {
   updateProfile,
 } from './controllers/UserController.js';
 const app: Express = express();
-const { PORT, COOKIE_SECRET } = process.env;
-const PostgresStore = connectPgSimple(session);
+const { PORT } = process.env;
+//const PostgresStore = connectPgSimple(session);
 
 app.use(sessionMiddleware); // Setup session management middleware
 app.use(express.json()); // Setup JSON body parsing middleware
@@ -28,6 +26,7 @@ app.use(express.urlencoded({ extended: false })); // Setup urlencoded (HTML Form
 // This allows the client to access any file inside the `public` directory
 // Only put file that you actually want to be publicly accessibly in the `public` folder
 app.use(express.static('public', { extensions: ['html'] }));
+/*
 app.use(
   session({
     store: new PostgresStore({ createTableIfMissing: true }),
@@ -38,6 +37,7 @@ app.use(
     saveUninitialized: false, // Only create sessions when we write to req.session
   }),
 );
+*/
 // -- Routes --------------------------------------------------
 // Register your routes below this line
 
@@ -49,9 +49,9 @@ app.get('/', (req, res) => {
 //user stuffs
 app.post('/register', registerUser);
 app.post('/login', logIn);
-app.get('/profile', getProfile);
-app.put('/profile', updateProfile);
-app.delete('/profile', deleteProfile);
+app.get('/profile', requireAuth, getProfile);
+app.put('/profile', requireAuth, updateProfile);
+app.delete('/profile', requireAuth, deleteProfile);
 //properties
 import {
   editProperty,
@@ -60,11 +60,11 @@ import {
   registerProperty,
   removeProperty,
 } from './controllers/PropertyController.js';
-app.get('/properties', getProperties);
-app.get('/properties/:propertyId', getProperty);
-app.post('/properties', registerProperty);
-app.put('/properties/:propertyId', editProperty);
-app.delete('/properties/:propertyId', removeProperty);
+app.get('/properties', requireAuth, getProperties);
+app.get('/properties/:propertyId', requireAuth, getProperty);
+app.post('/properties', requireAuth, registerProperty);
+app.put('/properties/:propertyId', requireAuth, editProperty);
+app.delete('/properties/:propertyId', requireAuth, removeProperty);
 
 //muh tenants
 import {
@@ -74,11 +74,11 @@ import {
   getTenants,
   removeTenant,
 } from './controllers/TenantController.js';
-app.get('/tenants', getTenants);
-app.get('/tenants/:tenantId', getTenant);
-app.post('/tenants', addTenant);
-app.put('/tenants/:tenantId', editTenant);
-app.delete('/tenants/:tenantId', removeTenant);
+app.get('/tenants', requireAuth, getTenants);
+app.get('/tenants/:tenantId', requireAuth, getTenant);
+app.post('/tenants', requireAuth, addTenant);
+app.put('/tenants/:tenantId', requireAuth, editTenant);
+app.delete('/tenants/:tenantId', requireAuth, removeTenant);
 
 //muh leases
 import {
@@ -89,11 +89,11 @@ import {
   removeLease,
 } from './controllers/LeaseController.js';
 
-app.get('/properties/:propertyId/leases', listLeasesForProperty);
-app.get('/leases/:leaseId', getLease);
-app.post('/properties/:propertyId/leases', addLease);
-app.put('/leases/:leaseId', editLease);
-app.delete('/leases/:leaseId', removeLease);
+app.get('/properties/:propertyId/leases', requireAuth, listLeasesForProperty);
+app.get('/leases/:leaseId', requireAuth, getLease);
+app.post('/properties/:propertyId/leases', requireAuth, addLease);
+app.put('/leases/:leaseId', requireAuth, editLease);
+app.delete('/leases/:leaseId', requireAuth, removeLease);
 
 //rent payment
 import {
@@ -102,11 +102,12 @@ import {
   getRentPayment,
   listRentPayments,
 } from './controllers/RentPaymentController.js';
+import { sessionMiddleware } from './sessionConfig.js';
 
-app.get('/leases/:leaseId/payments', listRentPayments);
-app.get('/payments/:paymentId', getRentPayment);
-app.post('/leases/:leaseId/payments', addRentPayment);
-app.put('/payments/:paymentId', editRentPayment);
+app.get('/leases/:leaseId/payments', requireAuth, listRentPayments);
+app.get('/payments/:paymentId', requireAuth, getRentPayment);
+app.post('/leases/:leaseId/payments', requireAuth, addRentPayment);
+app.put('/payments/:paymentId', requireAuth, editRentPayment);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../dataSource.js';
-import { RentPayment } from '../entities/RentPayments.js';
+//import { AppDataSource } from '../dataSource.js';
+//import { RentPayment } from '../entities/RentPayments.js';
 
 import {
   CreateRentPaymentSchema,
@@ -14,7 +14,7 @@ import {
   updateRentPayment,
 } from '../models/RentPaymentModel.js';
 
-export const PaymentRepository = AppDataSource.getRepository(RentPayment);
+//export const PaymentRepository = AppDataSource.getRepository(RentPayment);
 
 export async function listRentPayments(req: Request, res: Response): Promise<void> {
   try {

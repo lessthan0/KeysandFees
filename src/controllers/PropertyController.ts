@@ -1,4 +1,3 @@
-//import argon2 from 'argon2';
 import { Request, Response } from 'express';
 import {
   addProperty,
@@ -7,15 +6,12 @@ import {
   getPropertyForUser,
   updateProperty,
 } from '../models/PropertyModels.js';
-//import { parseDatabaseError } from '../utils/db-utils.js';
-import { PropertyStatus } from '../entities/Properties.js';
 
 import { CreatePropertySchema, UpdatePropertySchema } from '../validators/propertyValidators.js';
 
 export async function getProperties(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.session.authenticatedUser?.userId;
-    //const userId = requireLoggedIn(req, res);
 
     if (!userId) {
       res.sendStatus(401);
@@ -34,6 +30,7 @@ export async function getProperties(req: Request, res: Response): Promise<void> 
 export async function getProperty(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.session.authenticatedUser?.userId;
+
     if (!userId) {
       res.sendStatus(401);
       return;
@@ -59,15 +56,30 @@ export async function registerProperty(req: Request, res: Response): Promise<voi
   const result = CreatePropertySchema.safeParse(req.body);
 
   if (!result.success) {
-    res.status(400).json({ error: result.error });
+    res.status(400).json(result.error.flatten());
     return;
   }
 
-  const { address, status, bedrooms, rentAmount, yearbuilt } = result.data;
-  const stat = status as PropertyStatus;
-  const newProperty = await addProperty(address, bedrooms, rentAmount, yearbuilt, stat);
+  try {
+    const userId = req.session.authenticatedUser?.userId;
 
-  res.status(201).json({ property: newProperty });
+    if (!userId) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const Property = await addProperty(userId, result.data);
+
+    if (!Property) {
+      res.status(404).json({ message: 'Owner not found' });
+      return;
+    }
+
+    res.status(201).json(Property);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 }
 
 export async function editProperty(req: Request, res: Response): Promise<void> {
@@ -100,9 +112,11 @@ export async function editProperty(req: Request, res: Response): Promise<void> {
     res.sendStatus(500);
   }
 }
+
 export async function removeProperty(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.session.authenticatedUser?.userId;
+
     if (!userId) {
       res.sendStatus(401);
       return;

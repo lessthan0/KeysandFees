@@ -1,7 +1,10 @@
 import { z } from 'zod';
 import { AppDataSource } from '../dataSource.js';
-import { Property, PropertyStatus } from '../entities/Properties.js';
-import { UpdatePropertySchema } from '../validators/propertyValidators.js';
+import { Property } from '../entities/Properties.js';
+import { CreatePropertySchema, UpdatePropertySchema } from '../validators/propertyValidators.js';
+
+import { User } from '../entities/User.js';
+const UserRepository = AppDataSource.getRepository(User);
 const PropertyRepository = AppDataSource.getRepository(Property);
 
 async function getPropertyForUser(userId: string, propertyId: string): Promise<Property | null> {
@@ -16,6 +19,7 @@ async function getPropertyForUser(userId: string, propertyId: string): Promise<P
     },
   });
 }
+
 async function getPropertiesForUser(userId: string): Promise<Property[]> {
   return await PropertyRepository.find({
     where: {
@@ -26,24 +30,30 @@ async function getPropertiesForUser(userId: string): Promise<Property[]> {
     },
   });
 }
-async function addProperty(
-  address: string,
-  bedrooms: number,
-  yearbuilt: number,
-  rentAmount: number,
-  status: PropertyStatus,
-  imageUrl?: string | null,
-): Promise<Property> {
-  const newProperty = new Property();
-  newProperty.address = address;
-  newProperty.bedrooms = bedrooms;
-  newProperty.yearbuilt = yearbuilt;
-  newProperty.rentAmount = rentAmount;
-  newProperty.status = status;
-  newProperty.imageUrl = imageUrl;
-  // userId is generated automatically by @BeforeInsert
 
-  return PropertyRepository.save(newProperty);
+async function addProperty(
+  userId: string,
+  data: z.infer<typeof CreatePropertySchema>,
+): Promise<Property | null> {
+  const owner = await UserRepository.findOne({
+    where: { userId },
+  });
+
+  if (!owner) {
+    return null;
+  }
+
+  const newProperty = PropertyRepository.create({
+    address: data.address,
+    bedrooms: data.bedrooms,
+    yearbuilt: data.yearbuilt,
+    rentAmount: data.rentAmount,
+    status: data.status,
+    imageUrl: data.imageUrl ?? null,
+    owner,
+  });
+
+  return await PropertyRepository.save(newProperty);
 }
 
 async function updateProperty(
@@ -51,9 +61,7 @@ async function updateProperty(
   propertyId: string,
   data: z.infer<typeof UpdatePropertySchema>,
 ): Promise<Property | null> {
-  const propertyRepo = PropertyRepository;
-
-  const property = await propertyRepo.findOne({
+  const property = await PropertyRepository.findOne({
     where: {
       propertyId,
       owner: { userId },
@@ -84,33 +92,25 @@ async function updateProperty(
   }
 
   if (data.imageUrl !== undefined) {
-    property.imageUrl = data.imageUrl;
+    property.imageUrl = data.imageUrl ?? null;
   }
 
   if (data.status !== undefined) {
     property.status = data.status;
   }
 
-  return await propertyRepo.save(property);
+  return await PropertyRepository.save(property);
 }
 
 async function deleteProperty(userId: string, propertyId: string): Promise<boolean> {
   const property = await getPropertyForUser(userId, propertyId);
-  const propertyRepo = PropertyRepository;
-  //AppDataSource.getRepository(Property);
+
   if (!property) {
     return false;
   }
 
-  await propertyRepo.remove(property);
+  await PropertyRepository.remove(property);
   return true;
 }
 
-export {
-  addProperty,
-  deleteProperty,
-  getPropertiesForUser,
-  getPropertyForUser,
-  PropertyRepository,
-  updateProperty,
-};
+export { addProperty, deleteProperty, getPropertiesForUser, getPropertyForUser, updateProperty };
