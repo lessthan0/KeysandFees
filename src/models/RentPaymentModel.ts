@@ -104,8 +104,8 @@ async function createRentPayment(
       rentMonth: data.rentMonth,
       rentAmount: data.rentAmount,
       paidAt: data.paidAt ?? new Date(),
-      //late: data.late ?? false,
-      //notes: data.notes ?? null,
+      late: data.late ?? false,
+      notes: data.notes ?? null,
     });
 
     const savedPayment = await PaymentRepository.save(payment);

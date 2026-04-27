@@ -7,6 +7,7 @@ meta {
 post {
   url: {{baseUrl}}/properties/{{propertyId}}/leases
   body: json
+  auth: none
 }
 
 body:json {
@@ -16,6 +17,10 @@ body:json {
     "endDate": "2027-05-31",
     "monthlyRentCents": 120000
   }
+}
+
+vars:pre-request {
+  tenantId: 019dcc6bfc95735e969fc701fbde2963
 }
 
 assert {
