@@ -1,7 +1,7 @@
 meta {
   name: Create Lease
   type: http
-  seq: 9
+  seq: 23
 }
 
 post {
@@ -16,10 +16,6 @@ body:json {
     "endDate": "2027-05-31",
     "monthlyRentCents": 120000
   }
-}
-
-script:post-response {
-  bru.setVar("leaseId", res.body.leaseId);
 }
 
 assert {

@@ -1,0 +1,35 @@
+meta {
+  name: Create Property
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/properties
+  body: json
+}
+
+body:json {
+  {
+    "address": "126 Main Street",
+    "status": "vacant",
+    "rentAmount": 1215,
+    "bedrooms": 4,
+    "yearbuilt": 2015,
+    "imageUrl": "https://example1.com/property.jpg"
+  }
+}
+
+script:post-response {
+  bru.setVar("propertyId", res.body.propertyId);
+}
+
+tests {
+  test("property id returned", function() {
+    expect(res("propertyId")).to.exist
+  })
+}
+
+assert {
+  res.status: eq 201
+}

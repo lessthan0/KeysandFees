@@ -1,7 +1,7 @@
 meta {
   name: Update Rent Payment
   type: http
-  seq: 24
+  seq: 22
 }
 
 put {
@@ -11,9 +11,9 @@ put {
 
 body:json {
   {
-    "rentAmountPaid": 1200,
+    "rentAmount": 1200,
     "late": true,
-    "notes": "Marked late after grace period"
+    "notes": "Didn't pay full amount"
   }
 }
 

@@ -1,7 +1,7 @@
 meta {
   name: Create Tenant
   type: http
-  seq: 13
+  seq: 8
 }
 
 post {
@@ -11,19 +11,17 @@ post {
 
 body:json {
   {
-    "firstName": "John",
+    "firstName": "Jane",
     "lastName": "Doe",
-    "email": "john@example.com",
-    "phone": "555-123-1123",
+    "email": "jane@example.com",
+    "phone": "555-123-4567",
     "maritalStatus": "single",
-    "notes": "Hates dogs and hats"
+    "notes": "Pays on time"
   }
 }
 
-
 script:post-response {
-  console.log(res.body)
-  bru.setVar("tenantId", res("tenantId"))
+  bru.setVar("tenantId", res.body.tenantId);
 }
 
 assert {

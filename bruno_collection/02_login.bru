@@ -16,6 +16,12 @@ body:json {
   }
 }
 
+tests {
+ test("login sets cookie", function() {
+    expect(res.getHeader("set-cookie")).to.exist
+  })
+}
+
 assert {
   res.status: eq 200
 }

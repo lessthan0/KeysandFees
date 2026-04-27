@@ -1,6 +1,6 @@
 <script lang="ts">
   // Start with an empty array to show the "no properties" view
-  let properties = [];
+  let properties: string | any[] | null | undefined = [];
 
   function handleLogout() {
     window.location.href = '/';

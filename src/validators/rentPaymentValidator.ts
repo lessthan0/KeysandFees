@@ -15,8 +15,5 @@ export const UpdateRentPaymentSchema = z.object({
   notes: z.string().optional(),
 });
 
-//Do I want this? Should I upate the whole object or only pieces??
-//export const UpdateRentPaymentSchema = CreateRentPaymentSchema.partial();
-
 export type CreateRentPaymentSchema = z.infer<typeof CreateRentPaymentSchema>;
 export type UpdateRentPaymentSchema = z.infer<typeof UpdateRentPaymentSchema>;
