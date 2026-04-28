@@ -5,11 +5,17 @@ import {
   Entity,
   OneToMany,
   PrimaryColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
 import { Property } from './Properties.js';
 import { Tenant } from './Tenant.js';
+
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
 
 @Entity()
 export class User {
@@ -34,7 +40,7 @@ export class User {
   displayName!: string | null;
 
   @OneToMany(() => Property, (property) => property.owner)
-  properties!: Property[];
+  properties!: Relation<Property[]>;
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -42,6 +48,9 @@ export class User {
   @UpdateDateColumn()
   updatedAt!: Date;
 
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role!: UserRole;
+
   @OneToMany(() => Tenant, (tenant) => tenant.owner)
-  tenants!: Tenant[];
+  tenants!: Relation<Tenant[]>;
 }

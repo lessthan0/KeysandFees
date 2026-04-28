@@ -1,5 +1,7 @@
 import argon2 from 'argon2';
 import { Request, Response } from 'express';
+import { UserRole } from '../entities/User.js';
+
 import {
   addUser,
   deleteUser,
@@ -7,6 +9,7 @@ import {
   getUserProfile,
   updateUserProfile,
 } from '../models/UserModel.js';
+
 import { parseDatabaseError } from '../utils/db-utils.js';
 import { RegistrationSchema, UpdateProfileSchema } from '../validators/authValidator.js';
 
@@ -17,11 +20,11 @@ async function registerUser(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const { email, password } = result.data;
+  const { email, password, role, displayName } = result.data;
 
   try {
     const passwordHash = await argon2.hash(password);
-    const newUser = await addUser(email, passwordHash);
+    const newUser = await addUser(email, passwordHash, displayName, role);
     console.log(newUser);
     res.sendStatus(201);
   } catch (err) {
@@ -58,6 +61,7 @@ async function logIn(req: Request, res: Response): Promise<void> {
       userId: user.userId,
       email: user.email,
       displayName: user.displayName,
+      role: user.role,
     };
     req.session.isLoggedIn = true;
 
@@ -106,22 +110,23 @@ async function updateProfile(req: Request, res: Response): Promise<void> {
       return;
     }
 
+    // Ensure required fields are present and match the expected type
     const updateData: {
+      role: UserRole;
+      displayName: unknown;
       email?: string;
-      displayName?: string | null;
-      passwordHash?: string;
-    } = {};
+      password?: string;
+    } = {
+      role: result.data.role,
+      displayName: result.data.displayName,
+    };
 
     if (result.data.email !== undefined) {
       updateData.email = result.data.email;
     }
 
-    if (result.data.displayName !== undefined) {
-      updateData.displayName = result.data.displayName;
-    }
-
     if (result.data.password !== undefined) {
-      updateData.passwordHash = await argon2.hash(result.data.password);
+      updateData.password = await argon2.hash(result.data.password);
     }
 
     const updatedUser = await updateUserProfile(userId, updateData);

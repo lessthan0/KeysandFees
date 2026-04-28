@@ -1,5 +1,5 @@
 import 'express-session';
-
+import { UserRole } from '../entities/User.js';
 declare module 'express-session' {
   export interface Session {
     clearSession(): Promise<void>; // DO NOT MODIFY THIS!
@@ -9,6 +9,7 @@ declare module 'express-session' {
       userId: string;
       email: string;
       displayName: string;
+      role: UserRole;
     };
     isLoggedIn?: boolean;
     logInAttempts?: number;

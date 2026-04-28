@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AppDataSource } from '../dataSource.js';
-import { User } from '../entities/User.js';
+import { User, UserRole } from '../entities/User.js';
 import { UpdateProfileSchema } from '../validators/authValidator.js';
 const UserRepository = AppDataSource.getRepository(User);
 
@@ -43,17 +43,28 @@ async function updateUserProfile(
     user.passwordHash = data.password;
   }
 
+  if (data.role !== undefined) {
+    user.role = data.role;
+  }
+
   if (data.displayName !== undefined) {
-    user.displayName = data.displayName;
+    user.displayName = data.displayName as string;
   }
 
   return await UserRepository.save(user);
 }
 
-async function addUser(email: string, passwordHash: string): Promise<User> {
+async function addUser(
+  email: string,
+  passwordHash: string,
+  displayName: string,
+  role: UserRole,
+): Promise<User> {
   const newUser = new User();
   newUser.email = email;
   newUser.passwordHash = passwordHash;
+  newUser.displayName = displayName;
+  newUser.role = role;
   // userId is generated automatically by @BeforeInsert
 
   return UserRepository.save(newUser);

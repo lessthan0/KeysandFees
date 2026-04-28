@@ -35,4 +35,22 @@ function requireAuth(req: Request, res: Response, next: NextFunction): void {
   next();
 }
 
-export { requireAuth, sessionMiddleware };
+function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+  const user = req.session.authenticatedUser;
+  if (!user) {
+    res.sendStatus(401);
+    return;
+  }
+
+  if (user.role != 'admin') {
+    res.sendStatus(403);
+    return;
+  }
+  next();
+}
+
+function isAdmin(req: Request): boolean {
+  return req.session.authenticatedUser?.role === 'admin';
+}
+
+export { isAdmin, requireAdmin, requireAuth, sessionMiddleware };
