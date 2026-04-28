@@ -1,0 +1,27 @@
+meta {
+  name: Create Lease
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/properties/{{propertyId}}/leases
+  body: json
+}
+
+body:json {
+  {
+    "tenantId": "{{tenantId}}",
+    "startDate": "2026-06-01",
+    "endDate": "2027-05-31",
+    "monthlyRentCents": 120000
+  }
+}
+
+script:post-response {
+  bru.setVar("leaseId", res.body.leaseId);
+}
+
+assert {
+  res.status: eq 201
+}

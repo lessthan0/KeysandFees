@@ -1,8 +1,14 @@
+import './config.js';
 import connectPgSimple from 'connect-pg-simple';
 import { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 
 const isProduction = process.env.NODE_ENV === 'production';
+const cookieSecret = process.env.COOKIE_SECRET;
+
+if (!cookieSecret) {
+  throw new Error('COOKIE_SECRET is missing. Add it to your .env file.');
+}
 
 const PostgresStore = connectPgSimple(session);
 
@@ -14,7 +20,7 @@ const sessionStorage = new PostgresStore({
 
 const sessionMiddleware = session({
   store: sessionStorage,
-  secret: process.env.COOKIE_SECRET, // Signs cookie to prevent forgery
+  secret: cookieSecret, // Signs cookie to prevent forgery
   cookie: {
     maxAge: 8 * 60 * 60 * 1000, // 8-hour session expiry
     httpOnly: true, // No client-side JS access (XSS protection)
