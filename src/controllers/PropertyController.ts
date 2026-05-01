@@ -6,6 +6,7 @@ import {
   getPropertyForUser,
   updateProperty,
 } from '../models/PropertyModels.js';
+import { isAdmin } from '../sessionConfig.js';
 
 import { CreatePropertySchema, UpdatePropertySchema } from '../validators/propertyValidators.js';
 
@@ -18,7 +19,7 @@ export async function getProperties(req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const properties = await getPropertiesForUser(userId);
+    const properties = await getPropertiesForUser(userId, isAdmin(req));
 
     res.status(200).json(properties);
   } catch (err) {
@@ -38,7 +39,7 @@ export async function getProperty(req: Request, res: Response): Promise<void> {
 
     const { propertyId } = req.params;
 
-    const property = await getPropertyForUser(userId, propertyId);
+    const property = await getPropertyForUser(userId, propertyId, isAdmin(req));
 
     if (!property) {
       res.sendStatus(404);

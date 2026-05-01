@@ -25,14 +25,22 @@ async function getLeasesForUserProperty(userId: string, propertyId: string): Pro
     },
   });
 }
-async function getLeaseById(userId: string, leaseId: string): Promise<Lease | null> {
+async function getLeaseById(
+  userId: string,
+  leaseId: string,
+  isAdmin: boolean = false,
+): Promise<Lease | null> {
   try {
     const lease = await LeaseRepository.findOne({
       where: {
         leaseId,
-        property: {
-          owner: { userId },
-        },
+        ...(isAdmin
+          ? {}
+          : {
+              property: {
+                owner: { userId },
+              },
+            }),
       },
       relations: {
         property: {

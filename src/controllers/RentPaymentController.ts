@@ -13,6 +13,7 @@ import {
   getPaymentsForLease,
   updateRentPayment,
 } from '../models/RentPaymentModel.js';
+import { isAdmin } from '../sessionConfig.js';
 
 //export const PaymentRepository = AppDataSource.getRepository(RentPayment);
 
@@ -27,7 +28,7 @@ export async function listRentPayments(req: Request, res: Response): Promise<voi
 
     const { leaseId } = req.params;
 
-    const payments = await getPaymentsForLease(userId, leaseId);
+    const payments = await getPaymentsForLease(userId, leaseId, isAdmin(req));
 
     res.status(200).json(payments);
   } catch (err) {
@@ -47,7 +48,7 @@ export async function getRentPayment(req: Request, res: Response): Promise<void>
 
     const { paymentId } = req.params;
 
-    const payment = await getPaymentById(userId, paymentId);
+    const payment = await getPaymentById(userId, paymentId, isAdmin(req));
 
     if (!payment) {
       res.sendStatus(404);
@@ -121,7 +122,7 @@ export async function editRentPayment(req: Request, res: Response): Promise<void
 
     const { paymentId } = req.params;
 
-    const payment = await updateRentPayment(userId, paymentId, result.data);
+    const payment = await updateRentPayment(userId, paymentId, result.data, isAdmin(req));
 
     if (!payment) {
       res.sendStatus(404);
