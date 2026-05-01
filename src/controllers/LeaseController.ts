@@ -9,6 +9,7 @@ import {
   getLeasesForUserProperty,
   updateLease,
 } from '../models/LeaseModel.js';
+import { isAdmin } from '../sessionConfig.js';
 
 async function listLeasesForProperty(req: Request, res: Response): Promise<void> {
   try {
@@ -40,7 +41,7 @@ async function getLease(req: Request, res: Response): Promise<void> {
 
     const { leaseId } = req.params;
 
-    const lease = await getLeaseById(userId, leaseId);
+    const lease = await getLeaseById(userId, leaseId, isAdmin(req));
 
     if (!lease) {
       res.sendStatus(404);

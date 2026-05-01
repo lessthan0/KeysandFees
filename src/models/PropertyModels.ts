@@ -7,11 +7,19 @@ import { User } from '../entities/User.js';
 const UserRepository = AppDataSource.getRepository(User);
 const PropertyRepository = AppDataSource.getRepository(Property);
 
-async function getPropertyForUser(userId: string, propertyId: string): Promise<Property | null> {
+async function getPropertyForUser(
+  userId: string,
+  propertyId: string,
+  isAdmin: boolean = false,
+): Promise<Property | null> {
   return await PropertyRepository.findOne({
     where: {
       propertyId,
-      owner: { userId },
+      ...(isAdmin
+        ? {}
+        : {
+            owner: { userId },
+          }),
     },
     relations: {
       owner: true,
@@ -20,10 +28,14 @@ async function getPropertyForUser(userId: string, propertyId: string): Promise<P
   });
 }
 
-async function getPropertiesForUser(userId: string): Promise<Property[]> {
+async function getPropertiesForUser(userId: string, isAdmin: boolean = false): Promise<Property[]> {
   return await PropertyRepository.find({
     where: {
-      owner: { userId },
+      ...(isAdmin
+        ? {}
+        : {
+            owner: { userId },
+          }),
     },
     relations: {
       leases: true,

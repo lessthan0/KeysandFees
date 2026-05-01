@@ -10,15 +10,23 @@ import {
 const LeaseRepository = AppDataSource.getRepository(Lease);
 const PaymentRepository = AppDataSource.getRepository(RentPayment);
 
-async function getPaymentsForLease(userId: string, leaseId: string): Promise<RentPayment[]> {
+async function getPaymentsForLease(
+  userId: string,
+  leaseId: string,
+  isAdmin: boolean = false,
+): Promise<RentPayment[]> {
   try {
     const payments = await PaymentRepository.find({
       where: {
         lease: {
           leaseId,
-          property: {
-            owner: { userId },
-          },
+          ...(isAdmin
+            ? {}
+            : {
+                property: {
+                  owner: { userId },
+                },
+              }),
         },
       },
       relations: {
@@ -37,15 +45,23 @@ async function getPaymentsForLease(userId: string, leaseId: string): Promise<Ren
   }
 }
 
-async function getPaymentById(userId: string, paymentId: string): Promise<RentPayment | null> {
+async function getPaymentById(
+  userId: string,
+  paymentId: string,
+  isAdmin: boolean = false,
+): Promise<RentPayment | null> {
   try {
     const payment = await PaymentRepository.findOne({
       where: {
         paymentId,
         lease: {
-          property: {
-            owner: { userId },
-          },
+          ...(isAdmin
+            ? {}
+            : {
+                property: {
+                  owner: { userId },
+                },
+              }),
         },
       },
       relations: {
@@ -120,15 +136,20 @@ async function updateRentPayment(
   userId: string,
   paymentId: string,
   data: z.infer<typeof UpdateRentPaymentSchema>,
+  isAdmin: boolean = false,
 ): Promise<RentPayment | null> {
   try {
     const payment = await PaymentRepository.findOne({
       where: {
         paymentId,
         lease: {
-          property: {
-            owner: { userId },
-          },
+          ...(isAdmin
+            ? {}
+            : {
+                property: {
+                  owner: { userId },
+                },
+              }),
         },
       },
       relations: {
