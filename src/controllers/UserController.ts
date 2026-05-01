@@ -11,7 +11,7 @@ import {
 } from '../models/UserModel.js';
 
 import { parseDatabaseError } from '../utils/db-utils.js';
-import { RegistrationSchema, UpdateProfileSchema } from '../validators/authValidator.js';
+import { LoginSchema, RegistrationSchema, UpdateProfileSchema } from '../validators/authValidator.js';
 
 async function registerUser(req: Request, res: Response): Promise<void> {
   const result = RegistrationSchema.safeParse(req.body);
@@ -35,7 +35,7 @@ async function registerUser(req: Request, res: Response): Promise<void> {
 }
 
 async function logIn(req: Request, res: Response): Promise<void> {
-  const result = RegistrationSchema.safeParse(req.body);
+  const result = LoginSchema.safeParse(req.body);
   if (!result.success) {
     res.status(400).json(result.error.flatten());
     return;

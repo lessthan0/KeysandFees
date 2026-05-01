@@ -1,10 +1,29 @@
 <script lang="ts">
-  // We'll eventually pull the real name from your database/session
-  let userName = 'John Doe';
+  import { onMount } from 'svelte';
+  import { api } from '$lib/api';
 
-  function handleLogout() {
-    // Logic to clear session and go home
-    window.location.href = '/';
+  // We'll eventually pull the real name from your database/session
+  let userName = 'Loading...';
+
+  onMount(async () => {
+    try {
+      const profile: any = await api.get('/profile');
+      userName = profile.displayName || 'John Doe';
+    } catch (err) {
+      console.error('Failed to load profile:', err);
+      userName = 'Guest';
+    }
+  });
+
+  async function handleLogout() {
+    try {
+      // The backend uses session clearing in logIn/deleteProfile, but a dedicated logout endpoint might be better.
+      // If none exists, we'll just clear the frontend state and redirect.
+      // For now, redirect to login
+      window.location.href = '/login';
+    } catch (err) {
+      window.location.href = '/login';
+    }
   }
 </script>
 
@@ -33,6 +52,7 @@
 
         <nav class="profile-links">
           <a href="/properties">View Properties</a>
+          <a href="/tenants">View Tenants</a>
           <a href="/edit-profile">Edit Profile</a>
           <a href="/delete-account" class="danger">Delete Account</a>
         </nav>

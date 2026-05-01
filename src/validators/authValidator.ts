@@ -9,6 +9,11 @@ export const RegistrationSchema = z.object({
   displayName: z.string().min(1).max(50).nullable().optional(),
 });
 
+export const LoginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(8).max(64),
+});
+
 export const UpdateProfileSchema = z.object({
   email: z.email().optional(),
   password: z.string().min(8).optional(),

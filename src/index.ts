@@ -56,49 +56,59 @@ app.use(express.urlencoded({ extended: false })); // Setup urlencoded (HTML Form
 app.use(express.static('public', { extensions: ['html'] }));
 
 // -- Routes --------------------------------------------------
-// Register your routes below this line
+const apiRouter = express.Router();
 
 //test
-app.get('/', (req, res) => {
+apiRouter.get('/', (req, res) => {
   res.send('API is running');
 });
 
 //user stuffs
-app.post('/register', registerUser);
-app.post('/login', logIn);
-app.get('/profile', requireAuth, getProfile);
-app.put('/profile', requireAuth, updateProfile);
-app.delete('/profile', requireAuth, deleteProfile);
+apiRouter.post('/register', registerUser);
+apiRouter.post('/login', logIn);
+apiRouter.get('/profile', requireAuth, getProfile);
+apiRouter.put('/profile', requireAuth, updateProfile);
+apiRouter.delete('/profile', requireAuth, deleteProfile);
 //properties
 
-app.get('/properties', requireAuth, getProperties);
-app.get('/properties/:propertyId', requireAuth, getProperty);
-app.post('/properties', requireAuth, registerProperty);
-app.put('/properties/:propertyId', requireAuth, editProperty);
-app.delete('/properties/:propertyId', requireAuth, removeProperty);
+apiRouter.get('/properties', requireAuth, getProperties);
+apiRouter.get('/properties/:propertyId', requireAuth, getProperty);
+apiRouter.post('/properties', requireAuth, registerProperty);
+apiRouter.put('/properties/:propertyId', requireAuth, editProperty);
+apiRouter.delete('/properties/:propertyId', requireAuth, removeProperty);
 
 //muh tenants
 
-app.get('/tenants', requireAuth, getTenants);
-app.get('/tenants/:tenantId', requireAuth, getTenant);
-app.post('/tenants', requireAuth, addTenant);
-app.put('/tenants/:tenantId', requireAuth, editTenant);
-app.delete('/tenants/:tenantId', requireAuth, removeTenant);
+apiRouter.get('/tenants', requireAuth, getTenants);
+apiRouter.get('/tenants/:tenantId', requireAuth, getTenant);
+apiRouter.post('/tenants', requireAuth, addTenant);
+apiRouter.put('/tenants/:tenantId', requireAuth, editTenant);
+apiRouter.delete('/tenants/:tenantId', requireAuth, removeTenant);
 
 //muh leases
 
-app.get('/properties/:propertyId/leases', requireAuth, listLeasesForProperty);
-app.get('/leases/:leaseId', requireAuth, getLease);
-app.post('/properties/:propertyId/leases', requireAuth, addLease);
-app.put('/leases/:leaseId', requireAuth, editLease);
-app.delete('/leases/:leaseId', requireAuth, removeLease);
+apiRouter.get('/properties/:propertyId/leases', requireAuth, listLeasesForProperty);
+apiRouter.get('/leases/:leaseId', requireAuth, getLease);
+apiRouter.post('/properties/:propertyId/leases', requireAuth, addLease);
+apiRouter.put('/leases/:leaseId', requireAuth, editLease);
+apiRouter.delete('/leases/:leaseId', requireAuth, removeLease);
 
 //rent payment
 
-app.get('/leases/:leaseId/payments', requireAuth, listRentPayments);
-app.get('/payments/:paymentId', requireAuth, getRentPayment);
-app.post('/leases/:leaseId/payments', requireAuth, addRentPayment);
-app.put('/payments/:paymentId', requireAuth, editRentPayment);
+apiRouter.get('/leases/:leaseId/payments', requireAuth, listRentPayments);
+apiRouter.get('/payments/:paymentId', requireAuth, getRentPayment);
+apiRouter.post('/leases/:leaseId/payments', requireAuth, addRentPayment);
+apiRouter.put('/payments/:paymentId', requireAuth, editRentPayment);
+
+app.use('/api', apiRouter);
+
+// Serve the SvelteKit frontend in production
+app.use(express.static('frontend/build'));
+
+// Catch-all route to serve the frontend's index.html for SPA routing
+app.use((req, res) => {
+  res.sendFile('index.html', { root: 'frontend/build' });
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);

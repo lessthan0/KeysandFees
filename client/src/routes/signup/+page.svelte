@@ -1,241 +1,209 @@
 <script lang="ts">
-  import { goto } from '$app/navigation'; // SvelteKit navigation function
+  import { api } from '$lib/api';
 
-  // Setup form state variables
-  let fullName = '';
+  let firstName = '';
+  let lastName = '';
   let email = '';
   let password = '';
-  let errorMessage = '';
+  let showSuccess = false;
 
-  // Function to handle form submission
   async function handleSignup() {
-    console.log('Form data:', { fullName, email, password });
+    // The backend registerUser requires email, password, role, and displayName
+    const userData = { 
+      email, 
+      password,
+      role: 'user', // Backend expects 'admin' or 'user'
+      displayName: `${firstName} ${lastName}`
+    };
 
-    // Placeholder for backend validation/API call.
-    if (!fullName || !email || !password) {
-      errorMessage = 'All fields are required.';
-      return;
+    try {
+      await api.post('/register', userData);
+      showSuccess = true;
+    } catch (err: any) {
+      alert(`Signup Error: ${err.message || 'Is the server running?'}`);
     }
+  }
 
-    // On success, redirect to the login page (or dashboard)
-    // In a real app, this happens after the API confirms creation.
-    console.log('Success! Redirecting to login...');
-    goto('/login');
+  function goToLogin() {
+    window.location.href = '/login';
   }
 </script>
 
 <div class="landing-page">
   <header class="top-section">
     <div class="header-content">
-      <div class="logo-area">
-        <h1 class="main-title">Landlord APP</h1>
-      </div>
-
-      <nav class="inner-nav">
-        <a href="/">Home</a>
-        <a href="/signup" class="active">Signup</a>
-        <a href="/login">Login</a>
-      </nav>
+      <h1 class="main-title">Landlord APP</h1>
     </div>
   </header>
 
   <section class="bottom-section">
-    <div class="login-content">
-      <h2>Create An Account</h2>
+    <div class="form-container">
+      <h2>Create Your Account</h2>
 
       <form on:submit|preventDefault={handleSignup}>
-        <div class="input-group">
-          <label for="fullName">Full Name:</label>
-          <input type="text" id="fullName" bind:value={fullName} required placeholder="John Doe" />
+        <div class="input-row">
+          <label for="fname">First Name:</label>
+          <input id="fname" type="text" bind:value={firstName} required />
+        </div>
+        <div class="input-row">
+          <label for="lname">Last Name:</label>
+          <input id="lname" type="text" bind:value={lastName} required />
+        </div>
+        <div class="input-row">
+          <label for="email">Email Address:</label>
+          <input id="email" type="email" bind:value={email} required />
+        </div>
+        <div class="input-row">
+          <label for="pass">Password:</label>
+          <input id="pass" type="password" bind:value={password} required />
         </div>
 
-        <div class="input-group">
-          <label for="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            bind:value={email}
-            required
-            placeholder="landlord@example.com"
-          />
-        </div>
-
-        <div class="input-group">
-          <label for="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            bind:value={password}
-            required
-            placeholder="••••••••"
-          />
-        </div>
-
-        {#if errorMessage}
-          <p class="error-msg">{errorMessage}</p>
-        {/if}
-
-        <div class="button-container">
-          <button type="submit" class="oval-button">Sign Up</button>
+        <div class="form-actions">
+          <button type="submit" class="oval-btn primary">Sign Up</button>
         </div>
       </form>
     </div>
   </section>
+
+  {#if showSuccess}
+    <div class="overlay">
+      <div class="success-bubble">
+        <p>Account Created!</p>
+        <button class="logout-btn" on:click={goToLogin}>Go to Login</button>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
-  /* Ensure full-screen behavior from Layout */
   :global(body) {
     margin: 0;
     padding: 0;
     background-color: #000;
-    overflow-x: hidden;
   }
-
   .landing-page {
     display: flex;
     flex-direction: column;
     height: 100vh;
     width: 100vw;
+    position: relative;
   }
 
-  /* GREEN TOP SECTION - Matches others exactly */
   .top-section {
-    background-color: #1a472a; /* Dark Forest Green */
-    color: white;
-    height: 35vh;
+    background-color: #1a472a;
+    height: 25vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-bottom: 1px solid #333;
   }
 
   .header-content {
     width: 90%;
     max-width: 1000px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
   }
-
-  .logo-area {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-
   .main-title {
     font-family: serif;
-    font-size: 3rem;
+    font-size: 3.5rem;
+    color: white;
     margin: 0;
   }
 
-  .inner-nav {
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 20px;
-    display: flex;
-    gap: 20px;
-    background: rgba(0, 0, 0, 0.2);
-  }
-
-  .inner-nav a {
-    color: #ccc;
-    text-decoration: none;
-    font-size: 0.9rem;
-  }
-
-  .inner-nav a.active {
-    color: white;
-    font-weight: bold;
-  }
-
-  /* BLACK BOTTOM SECTION - Reusing Login styles */
   .bottom-section {
     background-color: #000;
     flex-grow: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding-top: 30px;
     color: white;
+    overflow-y: auto;
   }
 
-  .login-content {
+  .form-container {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     padding: 20px;
   }
-
   h2 {
-    font-size: 2.2rem;
-    margin-bottom: 40px;
-    text-align: left;
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    text-align: center;
   }
 
-  /* Form Layout */
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-  }
-
-  .input-group {
+  .input-row {
     display: flex;
     align-items: center;
     gap: 20px;
+    margin-bottom: 15px;
   }
-
   label {
-    width: 120px; /* Slight extra width for 'Full Name' label alignment */
+    width: 220px;
     text-align: right;
-    font-size: 1.2rem;
-    color: #cbd5e0; /* Match dim gray from ref */
+    font-size: 1.1rem;
   }
-
   input {
     flex: 1;
-    padding: 12px;
-    background-color: white;
+    padding: 8px;
     border: 2px solid #1a472a;
+    background: white;
     color: black;
-    font-size: 1.1rem;
-    border-radius: 4px; /* Slight rounding for input boxes */
+    border-radius: 4px;
   }
 
-  /* Optional simple error styling */
-  .error-msg {
-    color: #ff6b6b;
-    font-size: 0.9rem;
-    text-align: center;
-    margin: 0;
-  }
-
-  /* Oval Button */
-  .button-container {
-    margin-top: 30px;
+  .form-actions {
     display: flex;
     justify-content: center;
+    margin-top: 40px;
+    padding-bottom: 40px;
   }
 
-  .oval-button {
-    background: linear-gradient(to bottom, #1e4d2b, #11311c);
-    color: white;
-    border: 1px solid #333;
-    padding: 15px 80px;
-    border-radius: 50px; /* Oval shape */
-    font-size: 1.1rem;
+  .oval-btn {
+    padding: 15px 40px;
+    border-radius: 50px;
     font-weight: bold;
     cursor: pointer;
-    min-width: 250px;
-    transition:
-      filter 0.2s,
-      transform 0.1s;
+    border: 1px solid #333;
+    min-width: 180px;
   }
 
-  .oval-button:hover {
-    filter: brightness(1.2); /* Highlight effect from ref */
+  .primary {
+    background: linear-gradient(#1e4d2b, #11311c);
+    color: white;
   }
 
-  .oval-button:active {
-    transform: scale(0.98); /* Click effect */
+  .logout-btn {
+    background-color: #1a472a;
+    color: white;
+    border: 1px solid white;
+    padding: 10px 30px;
+    cursor: pointer;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .success-bubble {
+    background-color: #1a472a;
+    color: white;
+    padding: 4rem;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 3px solid white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   }
 </style>

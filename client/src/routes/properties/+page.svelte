@@ -1,9 +1,20 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { api } from '$lib/api';
+
   // Start with an empty array to show the "no properties" view
   let properties: string | any[] | null | undefined = [];
 
+  onMount(async () => {
+    try {
+      properties = await api.get('/properties');
+    } catch (err) {
+      console.error('Failed to load properties:', err);
+    }
+  });
+
   function handleLogout() {
-    window.location.href = '/';
+    window.location.href = '/login';
   }
 
   function goBack() {
@@ -12,6 +23,17 @@
 
   function goToAddProperty() {
     window.location.href = '/create-property';
+  }
+
+  function goToDeleteProperty(id: string) {
+    window.location.href = `/delete-property/${id}`;
+  }
+
+  function goToAddTenant() {
+    window.location.href = '/add-tenant';
+  }
+  function goToEditProperty(id: string) {
+    window.location.href = `/edit-property/${id}`;
   }
 </script>
 
@@ -31,7 +53,7 @@
 
       <h2 class="section-title">Current Properties</h2>
 
-      {#if properties.length > 0}
+      {#if properties && properties.length > 0}
         <div class="property-list">
           {#each properties as property, i}
             <div class="property-row">
@@ -40,10 +62,9 @@
                 <span class="address">{property.address}</span>
               </div>
               <div class="action-buttons">
-                <button class="action-btn">Add Tenant</button>
-                <button class="action-btn">Edit Tenant</button>
-                <button class="action-btn">Edit Property</button>
-                <button class="action-btn">Delete Property</button>
+                <button class="action-btn" on:click={goToAddTenant}>Add Tenant</button>
+                <button class="action-btn" on:click={() => goToEditProperty(property.propertyId)}>Edit Property</button>
+                <button class="action-btn" on:click={() => goToDeleteProperty(property.propertyId)}>Delete Property</button>
               </div>
             </div>
           {/each}

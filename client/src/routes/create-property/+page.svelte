@@ -1,22 +1,43 @@
 <script lang="ts">
-  // Form variables to hold property data
+  import { api } from '$lib/api';
+
+  // 1. All variables at the top
   let street = '';
   let city = '';
   let state = '';
   let zip = '';
   let rooms = '';
   let baths = '';
-  let pets = '';
+  let yearbuilt = '';
   let rent = '';
 
-  function handleCreateProperty() {
-    console.log('Saving Property:', { street, city, state, zip, rooms, baths, pets, rent });
-    // This is where we will eventually send a POST request to your backend
-    window.location.href = '/profile';
+  let showSuccess = false; // The toggle for your green bubble
+
+  // 2. Combined functions
+  async function handleCreateProperty() {
+    const propertyData = {
+      address: `${street}, ${city}, ${state} ${zip}`,
+      bedrooms: parseInt(rooms),
+      rentAmount: parseInt(rent), // Backend strictly expects an integer
+      yearbuilt: parseInt(yearbuilt)
+    };
+
+    try {
+      await api.post('/properties', propertyData);
+      showSuccess = true;
+    } catch (err: any) {
+      console.error('Failed to connect:', err);
+      alert(`Backend Error: ${err.message || 'Server is down.'}`);
+    }
   }
 
   function goBack() {
     window.location.href = '/profile';
+  }
+
+  function closeSuccess() {
+    showSuccess = false;
+    window.location.href = '/profile'; // Redirect after they acknowledge the success
   }
 </script>
 
@@ -36,36 +57,36 @@
 
       <form on:submit|preventDefault={handleCreateProperty}>
         <div class="input-row">
-          <label>Street Address:</label>
-          <input type="text" bind:value={street} required />
+          <label for="street">Street Address:</label>
+          <input id="street" type="text" bind:value={street} required />
         </div>
         <div class="input-row">
-          <label>City:</label>
-          <input type="text" bind:value={city} required />
+          <label for="city">City:</label>
+          <input id="city" type="text" bind:value={city} required />
         </div>
         <div class="input-row">
-          <label>State:</label>
-          <input type="text" bind:value={state} required />
+          <label for="state">State:</label>
+          <input id="state" type="text" bind:value={state} required />
         </div>
         <div class="input-row">
-          <label>Zip Code:</label>
-          <input type="text" bind:value={zip} required />
+          <label for="zip">Zip Code:</label>
+          <input id="zip" type="text" bind:value={zip} required />
         </div>
         <div class="input-row">
-          <label>Number of Rooms:</label>
-          <input type="number" bind:value={rooms} required />
+          <label for="rooms">Number of Rooms:</label>
+          <input id="rooms" type="number" bind:value={rooms} required />
         </div>
         <div class="input-row">
-          <label>Number of Bathrooms:</label>
-          <input type="number" bind:value={baths} required />
+          <label for="baths">Number of Bathrooms:</label>
+          <input id="baths" type="number" bind:value={baths} required />
         </div>
         <div class="input-row">
-          <label>Pet Friendly (Yes/No):</label>
-          <input type="text" bind:value={pets} required />
+          <label for="yearbuilt">Year Built:</label>
+          <input id="yearbuilt" type="number" bind:value={yearbuilt} required />
         </div>
         <div class="input-row">
-          <label>Amount of Rent in $:</label>
-          <input type="number" bind:value={rent} required />
+          <label for="rent">Amount of Rent in $:</label>
+          <input id="rent" type="number" bind:value={rent} required />
         </div>
 
         <div class="form-actions">
@@ -75,6 +96,16 @@
       </form>
     </div>
   </section>
+
+  <!-- The Success Pop-up sitting inside your main layout -->
+  {#if showSuccess}
+    <div class="overlay">
+      <div class="success-bubble">
+        <p>Property Created!</p>
+        <button class="logout-btn" on:click={closeSuccess}>Close</button>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -88,11 +119,12 @@
     flex-direction: column;
     height: 100vh;
     width: 100vw;
+    position: relative; /* Important for the overlay */
   }
 
   .top-section {
     background-color: #1a472a;
-    height: 25vh; /* Made slightly shorter to fit the long form below */
+    height: 25vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -127,7 +159,7 @@
     align-items: flex-start;
     padding-top: 30px;
     color: white;
-    overflow-y: auto; /* Allows scrolling if the form is tall */
+    overflow-y: auto;
   }
 
   .form-container {
@@ -187,5 +219,31 @@
   }
   .oval-btn:hover {
     filter: brightness(1.2);
+  }
+
+  /* Overlay Styles */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .success-bubble {
+    background-color: #1a472a;
+    color: white;
+    padding: 4rem;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 3px solid white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   }
 </style>

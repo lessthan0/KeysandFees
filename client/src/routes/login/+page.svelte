@@ -1,10 +1,16 @@
 <script lang="ts">
+  import { api } from '$lib/api';
+
   let email = '';
   let password = '';
 
-  function handleLogin() {
-    console.log('Logging in with:', email);
-    window.location.href = '/';
+  async function handleLogin() {
+    try {
+      await api.post('/login', { email, password });
+      window.location.href = '/profile';
+    } catch (err: any) {
+      alert(`Login failed: ${err.message}`);
+    }
   }
 </script>
 
