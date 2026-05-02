@@ -1,23 +1,25 @@
 meta {
-  name: Register User
-  type: https
+  name: Register Admin
+  type: http
   seq: 1
 }
 
 post {
   url: {{baseUrl}}/api/register
   body: json
+  auth: none
 }
 
 body:json {
   {
     "email": "{{userEmail}}",
     "password": "{{userPassword}}",
-    "role": "user"
+    "displayName": "Scooter",
+    "role": "admin"
   }
 }
 
 assert {
   res.status: eq 201
 }
-
+                 
