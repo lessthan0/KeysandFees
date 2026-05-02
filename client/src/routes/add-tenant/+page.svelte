@@ -76,9 +76,12 @@
           <label for="maritalStatus">Marital Status:</label>
           <input id="maritalStatus" type="text" bind:value={maritalStatus} />
         </div>
-        <div class="input-row">
+        <div class="input-row notes-row">
           <label for="notes">Notes:</label>
-          <input id="notes" type="text" bind:value={notes} />
+          <div class="textarea-container">
+            <textarea id="notes" bind:value={notes} maxlength="500" rows="4"></textarea>
+            <div class="char-counter">{notes.length} / 500 characters</div>
+          </div>
         </div>
 
         <div class="form-actions">
@@ -176,13 +179,36 @@
     text-align: right;
     font-size: 1.1rem;
   }
-  input {
+  input, textarea {
     flex: 1;
     padding: 8px;
     border: 2px solid #1a472a;
     background: white;
     color: black;
     border-radius: 4px;
+    font-family: inherit;
+  }
+  
+  .notes-row {
+    align-items: flex-start;
+  }
+
+  .textarea-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .char-counter {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #ccc;
+    margin-top: 4px;
   }
 
   .form-actions {
