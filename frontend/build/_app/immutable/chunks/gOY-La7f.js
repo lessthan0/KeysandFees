@@ -1,1 +1,0 @@
-import{s as o,b as p,E as a,i as c,d as _}from"./DocsOf9D.js";import{p as u}from"./Bu0tOl2i.js";import{B as f}from"./C5kqta96.js";function d(r,e,...t){var i=new f(r);p(()=>{const n=e()??null;n==null&&c(),i.ensure(n,n&&(s=>n(s,...t)))},a)}function E(r,e){const t=(i,...n)=>{var s=_;o(r);try{return e(i,...n)}finally{o(s)}};return u(t),t}export{d as s,E as w};

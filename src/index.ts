@@ -44,6 +44,7 @@ import {
 } from './controllers/LeaseController.js';
 
 const app: Express = express();
+app.set('trust proxy', 1);
 const { PORT } = process.env;
 const frontendDir = path.join(process.cwd(), 'frontend', 'build');
 //const PostgresStore = connectPgSimple(session);
@@ -56,7 +57,7 @@ app.use(express.urlencoded({ extended: false })); // Setup urlencoded (HTML Form
 // This allows the client to access any file inside the `public` directory
 // Only put file that you actually want to be publicly accessibly in the `public` folder
 app.use(express.static('public', { extensions: ['html'] }));
-app.use(express.static(frontendDir, { extensions: ['html'] }));
+//app.use(express.static(frontendDir, { extensions: ['html'] }));
 app.use(express.static('frontend/build'));
 // -- Routes --------------------------------------------------
 
@@ -107,8 +108,12 @@ app.get('/api/me', (req, res) => {
     return;
   }
 
-  const { userId, email, displayName } = req.session.authenticatedUser;
-  res.json({ id: userId, email, displayName });
+  const { userId, email, displayName, role } = req.session.authenticatedUser;
+  res.json({ id: userId, email, displayName, role });
+});
+
+app.use((req, res) => {
+  res.sendFile('index.html', { root: 'frontend/build' });
 });
 
 app.listen(process.env.PORT, () => {
