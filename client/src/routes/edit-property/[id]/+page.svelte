@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { api } from '$lib/api';
+  import { onMount } from 'svelte';
 
   let street = '';
   let city = '';
@@ -12,13 +12,13 @@
   let yearbuilt = '';
   let rent = '';
 
-  let showSuccess = false; 
+  let showSuccess = false;
 
   onMount(async () => {
     try {
       const propertyId = $page.params.id;
       const data: any = await api.get(`/properties/${propertyId}`);
-      
+
       // Basic reverse parsing for the combined address string
       // e.g. "123 Main St, City, State 12345"
       const parts = data.address ? data.address.split(', ') : [];
@@ -48,7 +48,7 @@
       address: `${street}, ${city}, ${state} ${zip}`,
       bedrooms: parseInt(rooms),
       rentAmount: parseInt(rent),
-      yearbuilt: parseInt(yearbuilt)
+      yearbuilt: parseInt(yearbuilt),
     };
 
     try {
@@ -66,7 +66,7 @@
 
   function closeSuccess() {
     showSuccess = false;
-    window.location.href = '/properties'; 
+    window.location.href = '/properties';
   }
 </script>
 
@@ -75,7 +75,8 @@
     <div class="header-content">
       <h1 class="main-title">Landlord APP</h1>
       <div class="logout-container">
-        <button class="logout-btn" on:click={() => window.location.href = '/login'}>Logout</button>
+        <button class="logout-btn" on:click={() => (window.location.href = '/login')}>Logout</button
+        >
       </div>
     </div>
   </header>
@@ -243,9 +244,14 @@
   }
   .overlay {
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.8);
-    display: flex; justify-content: center; align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     z-index: 100;
   }
   .success-bubble {

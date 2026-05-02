@@ -1,12 +1,13 @@
 meta {
   name: Login
-  type: http
+  type: https
   seq: 2
 }
 
 post {
-  url: {{baseUrl}}/login
+  url: {{baseUrl}}/api/login
   body: json
+  auth: inherit
 }
 
 body:json {
@@ -16,12 +17,13 @@ body:json {
   }
 }
 
-tests {
- test("login sets cookie", function() {
-    expect(res.getHeader("set-cookie")).to.exist
-  })
-}
-
 assert {
   res.status: eq 200
 }
+
+tests {
+   test("login sets cookie", function() {
+    expect(res.getHeader("set-cookie")).to.exist
+  })
+}
+​

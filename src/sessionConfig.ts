@@ -1,7 +1,8 @@
-import './config.js';
 import connectPgSimple from 'connect-pg-simple';
 import { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
+import { Pool } from 'pg';
+import './config.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieSecret = process.env.COOKIE_SECRET;
@@ -10,26 +11,60 @@ if (!cookieSecret) {
   throw new Error('COOKIE_SECRET is missing. Add it to your .env file.');
 }
 
+function requireEnv(name: string): string {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`${name} is missing. Add it to your .env file.`);
+  }
+
+  return value;
+}
+
+const DB_HOST = requireEnv('DB_HOST');
+const DB_PORT = Number(requireEnv('DB_PORT'));
+const DB_USERNAME = requireEnv('DB_USERNAME');
+const DB_PASSWORD = requireEnv('DB_PASSWORD');
+const DB_NAME = requireEnv('DB_NAME');
+
+if (Number.isNaN(DB_PORT)) {
+  throw new Error('DB_PORT must be a valid number.');
+}
+
 const PostgresStore = connectPgSimple(session);
+
+const pgPool = new Pool({
+  host: DB_HOST,
+  port: DB_PORT,
+  user: DB_USERNAME,
+  password: DB_PASSWORD,
+  database: DB_NAME,
+
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
 
 // Store sessions in PostgreSQL
 const sessionStorage = new PostgresStore({
   createTableIfMissing: true,
-  conString: `postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+  pool: pgPool,
 });
 
 const sessionMiddleware = session({
   store: sessionStorage,
-  secret: cookieSecret, // Signs cookie to prevent forgery
+  secret: cookieSecret,
+
   cookie: {
-    maxAge: 8 * 60 * 60 * 1000, // 8-hour session expiry
-    httpOnly: true, // No client-side JS access (XSS protection)
-    secure: isProduction, // HTTPS only in production
-    sameSite: 'lax', // Basic CSRF protection
+    maxAge: 8 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
   },
-  name: 'session', // Cookie name in the browser
-  resave: false, // Skip re-saving unmodified sessions
-  saveUninitialized: false, // Don't save empty sessions (no cookie until session is used)
+
+  name: 'session',
+  resave: false,
+  saveUninitialized: false,
 });
 
 function requireAuth(req: Request, res: Response, next: NextFunction): void {
@@ -43,15 +78,17 @@ function requireAuth(req: Request, res: Response, next: NextFunction): void {
 
 function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   const user = req.session.authenticatedUser;
+
   if (!user) {
     res.sendStatus(401);
     return;
   }
 
-  if (user.role != 'admin') {
+  if (user.role !== 'admin') {
     res.sendStatus(403);
     return;
   }
+
   next();
 }
 
