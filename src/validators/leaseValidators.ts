@@ -5,6 +5,7 @@ const LeaseFieldsSchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   rentAmount: z.number().int().positive(),
+  leasePdfToken: z.string().uuid().optional(),
 });
 
 export const CreateLeaseSchema = LeaseFieldsSchema.refine((data) => data.endDate > data.startDate, {

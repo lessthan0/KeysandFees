@@ -114,6 +114,28 @@ async function updateProperty(
   return await PropertyRepository.save(property);
 }
 
+async function addImageToProperty(
+  propertyId: string,
+  imagePath: string,
+  fileSize: number,
+  originalName: string,
+): Promise<Property | null> {
+  const property = await PropertyRepository.findOne({
+    where: { propertyId },
+  });
+
+  if (!property) {
+    return null;
+  }
+
+  property.imageUrl = imagePath;
+  property.imageFileSize = fileSize;
+  property.imageOriginalName = originalName;
+
+  const savedPhoto = await PropertyRepository.save(property);
+  return savedPhoto;
+}
+
 async function deleteProperty(userId: string, propertyId: string): Promise<boolean> {
   const property = await getPropertyForUser(userId, propertyId);
 
@@ -125,4 +147,11 @@ async function deleteProperty(userId: string, propertyId: string): Promise<boole
   return true;
 }
 
-export { addProperty, deleteProperty, getPropertiesForUser, getPropertyForUser, updateProperty };
+export {
+  addImageToProperty,
+  addProperty,
+  deleteProperty,
+  getPropertiesForUser,
+  getPropertyForUser,
+  updateProperty,
+};

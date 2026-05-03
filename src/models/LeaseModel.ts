@@ -3,7 +3,6 @@ import { AppDataSource } from '../dataSource.js';
 import { Lease, LeaseStatus } from '../entities/Lease.js';
 import { Property, PropertyStatus } from '../entities/Properties.js';
 import { Tenant } from '../entities/Tenant.js';
-
 import { CreateLeaseSchema, UpdateLeaseSchema } from '../validators/leaseValidators.js';
 
 const LeaseRepository = AppDataSource.getRepository(Lease);
@@ -168,7 +167,31 @@ async function endLeaseForUser(userId: string, leaseId: string): Promise<Lease |
   return await LeaseRepository.save(lease);
 }
 
+async function addPdfToLease(
+  leaseId: string,
+  pdfPath: string,
+  fileSize: number,
+  originalName: string,
+): Promise<Lease | null> {
+  const lease = await LeaseRepository.findOne({
+    where: { leaseId },
+  });
+
+  if (!lease) {
+    return null;
+  }
+
+  lease.leasePdf = pdfPath;
+  lease.leasePdfFileSize = fileSize;
+  lease.leasePdfOriginalName = originalName;
+
+  const savedLease = await LeaseRepository.save(lease); // cascades to LeasePdf
+
+  return savedLease;
+}
+
 export {
+  addPdfToLease,
   createLease,
   endLeaseForUser,
   getLeaseById,

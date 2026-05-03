@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+
 import {
+  addImageToProperty,
   addProperty,
   deleteProperty,
   getPropertiesForUser,
@@ -114,6 +116,30 @@ export async function editProperty(req: Request, res: Response): Promise<void> {
   }
 }
 
+export async function uploadPropertyImage(req: Request, res: Response): Promise<void> {
+  try {
+    const { propertyId } = req.params;
+
+    if (!req.file) {
+      res.status(400).json({ error: 'No property image uploaded.' });
+      return;
+    }
+
+    const imageUrl = '/uploads/properties/${req.file.filename}';
+
+    const updatedProperty = await addImageToProperty(
+      propertyId,
+      imageUrl,
+      req.file.size,
+      req.file.originalname,
+    );
+
+    res.status(200).json(updatedProperty);
+  } catch (error) {
+    console.error('Upload property image failed:', error);
+    res.status(500).json({ error: 'Failed to upload property image.' });
+  }
+}
 export async function removeProperty(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.session.authenticatedUser?.userId;

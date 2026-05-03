@@ -11,7 +11,11 @@ import {
 } from '../models/UserModel.js';
 
 import { parseDatabaseError } from '../utils/db-utils.js';
-import { LoginSchema, RegistrationSchema, UpdateProfileSchema } from '../validators/authValidator.js';
+import {
+  LoginSchema,
+  RegistrationSchema,
+  UpdateProfileSchema,
+} from '../validators/authValidator.js';
 
 async function registerUser(req: Request, res: Response): Promise<void> {
   const result = RegistrationSchema.safeParse(req.body);

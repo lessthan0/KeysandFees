@@ -64,6 +64,16 @@ export class Lease {
   @OneToMany(() => RentPayment, (payment) => payment.lease)
   payments!: RentPayment[];
 
+  // PDF shiz
+  @Column({ type: 'varchar', nullable: true })
+  leasePdf!: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  leasePdfOriginalName!: string | null;
+
+  @Column({ type: 'int', nullable: true })
+  leasePdfFileSize!: number | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

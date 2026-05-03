@@ -48,6 +48,12 @@ export class Property {
   @Column({ type: 'text', nullable: true })
   imageUrl!: string | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  imageOriginalName!: string | null;
+
+  @Column({ type: 'int', nullable: true })
+  imageFileSize!: number | null;
+
   @ManyToOne(() => User, (user) => user.properties, {
     nullable: false,
     onDelete: 'CASCADE',
