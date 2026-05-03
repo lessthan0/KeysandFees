@@ -1,6 +1,20 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  async function uploadPropertyImage(propertyId: string, form: HTMLFormElement) {
+    const formData = new FormData(form);
+    const res = await fetch(`/api/properties/${propertyId}/img`, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+    if (res.ok) {
+      alert('Property image uploaded successfully!');
+      properties = await api.get('/properties');
+    } else {
+      alert('Failed to upload property image.');
+    }
+  }
   import { api } from '$lib/api';
+  import { onMount } from 'svelte';
 
   // Start with an empty array to show the "no properties" view
   let properties: string | any[] | null | undefined = [];
@@ -60,13 +74,46 @@
               <div class="property-info">
                 <span class="label">Property {i + 1}:</span>
                 <span class="address">{property.address}</span>
+                {#if property.imageUrl}
+                  <div class="property-image-container">
+                    <img src={property.imageUrl} alt="Property Image" class="property-image" />
+                  </div>
+                {/if}
               </div>
               <div class="action-buttons">
                 <button class="action-btn" on:click={goToAddTenant}>Add Tenant</button>
-                <button class="action-btn" on:click={() => goToEditProperty(property.propertyId)}>Edit Property</button>
-                <button class="action-btn" on:click={() => goToDeleteProperty(property.propertyId)}>Delete Property</button>
+                <button class="action-btn" on:click={() => goToEditProperty(property.propertyId)}>
+                  Edit Property
+                </button>
+                <button class="action-btn" on:click={() => goToDeleteProperty(property.propertyId)}>
+                  Delete Property
+                </button>
               </div>
             </div>
+            <!-- Property Image Upload Form -->
+            <form
+              style="margin: 10px 0 30px 0;"
+              on:submit|preventDefault={async (e) => {
+                await uploadPropertyImage(property.propertyId, e.target as HTMLFormElement);
+              }}
+            >
+              <input type="file" name="propertyImg" accept="image/*" required />
+              <button type="submit">Upload Property Photo</button>
+            </form>
+            <style>
+              .property-image-container {
+                margin-top: 10px;
+                margin-bottom: 10px;
+                text-align: left;
+              }
+              .property-image {
+                max-width: 200px;
+                max-height: 150px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+                margin-top: 5px;
+              }
+            </style>
           {/each}
         </div>
       {:else}

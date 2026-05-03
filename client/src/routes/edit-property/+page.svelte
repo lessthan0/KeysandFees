@@ -1,8 +1,8 @@
 <script lang="ts">
   // Example data for a specific property (eventually from your database)
   let streetAddress = '81 County Road';
-  let rooms = 3;
-  let baths = 2;
+  let bedrooms = 3;
+  let bathrooms = 2;
   let petFriendly = 'Yes';
   let fencedBackyard = 'Yes';
   let yearBuilt = '2015';
@@ -36,28 +36,28 @@
 
       <form on:submit|preventDefault={handleSaveChanges}>
         <div class="input-row">
-          <label>Number of Rooms:</label>
-          <input type="number" bind:value={rooms} />
+          <label for="bedrooms">Number of Bedrooms:</label>
+          <input id="bedrooms" type="number" bind:value={bedrooms} />
         </div>
         <div class="input-row">
-          <label>Number of Bathrooms:</label>
-          <input type="number" bind:value={baths} />
+          <label for="bathrooms">Number of Bathrooms:</label>
+          <input id="bathrooms" type="number" bind:value={bathrooms} />
         </div>
         <div class="input-row">
-          <label>Pet Friendly (Yes/No):</label>
-          <input type="text" bind:value={petFriendly} />
+          <label for="petFriendly">Pet Friendly (Yes/No):</label>
+          <input id="petFriendly" type="text" bind:value={petFriendly} />
         </div>
         <div class="input-row">
-          <label>Fenced in Backyard (Yes/No):</label>
-          <input type="text" bind:value={fencedBackyard} />
+          <label for="fencedBackyard">Fenced in Backyard (Yes/No):</label>
+          <input id="fencedBackyard" type="text" bind:value={fencedBackyard} />
         </div>
         <div class="input-row">
-          <label>Year Built:</label>
-          <input type="text" bind:value={yearBuilt} />
+          <label for="yearBuilt">Year Built:</label>
+          <input id="yearBuilt" type="text" bind:value={yearBuilt} />
         </div>
         <div class="input-row">
-          <label>Amount of Rent:</label>
-          <input type="text" bind:value={rentAmount} />
+          <label for="rentAmount">Amount of Rent:</label>
+          <input id="rentAmount" type="text" bind:value={rentAmount} />
         </div>
 
         <div class="edit-footer">

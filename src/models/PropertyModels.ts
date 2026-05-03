@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { AppDataSource } from '../dataSource.js';
-import { Property } from '../entities/Properties.js';
+import { Property, PropertyStatus } from '../entities/Properties.js';
 import { CreatePropertySchema, UpdatePropertySchema } from '../validators/propertyValidators.js';
 
 import { User } from '../entities/User.js';
 const UserRepository = AppDataSource.getRepository(User);
 const PropertyRepository = AppDataSource.getRepository(Property);
+type CreatePropertyInput = z.infer<typeof CreatePropertySchema>;
+type UpdatePropertyInput = z.infer<typeof UpdatePropertySchema>;
 
 async function getPropertyForUser(
   userId: string,
@@ -43,10 +45,7 @@ async function getPropertiesForUser(userId: string, isAdmin: boolean = false): P
   });
 }
 
-async function addProperty(
-  userId: string,
-  data: z.infer<typeof CreatePropertySchema>,
-): Promise<Property | null> {
+async function addProperty(userId: string, data: CreatePropertyInput): Promise<Property | null> {
   const owner = await UserRepository.findOne({
     where: { userId },
   });
@@ -58,6 +57,9 @@ async function addProperty(
   const newProperty = PropertyRepository.create({
     address: data.address,
     bedrooms: data.bedrooms,
+    bathrooms: data.bathrooms,
+    petFriendly: data.petFriendly,
+    fencedBackyard: data.fencedBackyard,
     yearbuilt: data.yearbuilt,
     rentAmount: data.rentAmount,
     status: data.status,
@@ -71,7 +73,7 @@ async function addProperty(
 async function updateProperty(
   userId: string,
   propertyId: string,
-  data: z.infer<typeof UpdatePropertySchema>,
+  data: UpdatePropertyInput,
 ): Promise<Property | null> {
   const property = await PropertyRepository.findOne({
     where: {
@@ -108,7 +110,19 @@ async function updateProperty(
   }
 
   if (data.status !== undefined) {
-    property.status = data.status;
+    property.status = data.status as PropertyStatus;
+  }
+
+  if (data.bathrooms !== undefined) {
+    property.bathrooms = data.bathrooms;
+  }
+
+  if (data.petFriendly !== undefined) {
+    property.petFriendly = data.petFriendly;
+  }
+
+  if (data.fencedBackyard !== undefined) {
+    property.fencedBackyard = data.fencedBackyard;
   }
 
   return await PropertyRepository.save(property);

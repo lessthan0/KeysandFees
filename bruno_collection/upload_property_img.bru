@@ -1,0 +1,29 @@
+meta {
+  name: Upload Property Image
+  type: http
+  seq: 29
+}
+
+post {
+  url: {{baseUrl}}/properties/{{propertyId}}/image
+  body: multipartForm
+}
+
+body:multipart-form {
+  propertyImage: @file({{propertyImagePath}})
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("property image upload should succeed", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("response should include imageUrl", function() {
+    expect(res.body.imageUrl).to.be.a("string");
+    expect(res.body.imageUrl).to.include("/uploads/properties/");
+  });
+}

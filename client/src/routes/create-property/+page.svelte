@@ -6,10 +6,10 @@
   let city = '';
   let state = '';
   let zip = '';
-  let rooms = '';
-  let baths = '';
+  let bedrooms = '';
+  let bathrooms = '';
   let yearbuilt = '';
-  let rent = '';
+  let rentAmount = '';
 
   let showSuccess = false; // The toggle for your green bubble
 
@@ -17,9 +17,9 @@
   async function handleCreateProperty() {
     const propertyData = {
       address: `${street}, ${city}, ${state} ${zip}`,
-      bedrooms: parseInt(rooms),
-      rentAmount: parseInt(rent), // Backend strictly expects an integer
-      yearbuilt: parseInt(yearbuilt)
+      bedrooms: parseInt(bedrooms),
+      rentAmount: parseInt(rentAmount), // Backend strictly expects an integer
+      yearbuilt: parseInt(yearbuilt),
     };
 
     try {
@@ -73,20 +73,20 @@
           <input id="zip" type="text" bind:value={zip} required />
         </div>
         <div class="input-row">
-          <label for="rooms">Number of Rooms:</label>
-          <input id="rooms" type="number" bind:value={rooms} required />
+          <label for="bedrooms">Number of Rooms:</label>
+          <input id="bedrooms" type="number" bind:value={bedrooms} required />
         </div>
         <div class="input-row">
-          <label for="baths">Number of Bathrooms:</label>
-          <input id="baths" type="number" bind:value={baths} required />
+          <label for="bathrooms">Number of Bathrooms:</label>
+          <input id="bathrooms" type="number" bind:value={bathrooms} required />
         </div>
         <div class="input-row">
           <label for="yearbuilt">Year Built:</label>
           <input id="yearbuilt" type="number" bind:value={yearbuilt} required />
         </div>
         <div class="input-row">
-          <label for="rent">Amount of Rent in $:</label>
-          <input id="rent" type="number" bind:value={rent} required />
+          <label for="rentAmount">Amount of Rent in $:</label>
+          <input id="rentAmount" type="number" bind:value={rentAmount} required />
         </div>
 
         <div class="form-actions">

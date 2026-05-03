@@ -36,6 +36,8 @@ import {
   removeTenant,
 } from './controllers/TenantController.js';
 
+import { ErrorRequestHandler } from 'express';
+import multer from 'multer';
 import {
   addLease,
   editLease,
@@ -45,9 +47,21 @@ import {
   uploadLease,
 } from './controllers/LeaseController.js';
 
+const uploadErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      res.status(413).json({ error: 'File too large (max 2 MB)' });
+      return;
+    }
+    res.status(400).json({ error: err.message });
+    return;
+  }
+  next(err); // not a multer error, pass it on
+};
+
 const app: Express = express();
 app.set('trust proxy', 1);
-
+app.use(uploadErrorHandler);
 const { PORT } = process.env;
 const frontendDir = path.join(process.cwd(), 'frontend', 'build');
 //const PostgresStore = connectPgSimple(session);
@@ -98,7 +112,7 @@ app.put('/api/properties/:propertyId', requireAuth, requireAdmin, editProperty);
 app.delete('/api/properties/:propertyId', requireAuth, requireAdmin, removeProperty);
 
 app.post(
-  '/api/leases/:leaseId/pdf',
+  '/api/properties/:propertyId/img',
   requireAuth,
   requireAdmin,
   uploadPhoto.single('propertyImg'),

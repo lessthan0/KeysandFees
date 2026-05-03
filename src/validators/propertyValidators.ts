@@ -8,6 +8,9 @@ export const CreatePropertySchema = z.object({
   status: propertyStatusSchema.default(PropertyStatus.VACANT),
   rentAmount: z.number().int().positive(),
   bedrooms: z.coerce.number().min(1),
+  bathrooms: z.coerce.number().int().min(0).default(1),
+  petFriendly: z.coerce.boolean().default(false),
+  fencedBackyard: z.coerce.boolean().default(false),
   yearbuilt: z.coerce.number().min(1930).max(2026),
   imageUrl: z.url().optional(),
 });

@@ -1,6 +1,20 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  async function uploadLeasePdf(leaseId: string, form: HTMLFormElement) {
+    const formData = new FormData(form);
+    const res = await fetch(`/api/leases/${leaseId}/pdf`, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+    if (res.ok) {
+      alert('Lease PDF uploaded successfully!');
+      leases = await api.get('/leases');
+    } else {
+      alert('Failed to upload lease PDF.');
+    }
+  }
   import { api } from '$lib/api';
+  import { onMount } from 'svelte';
 
   let leases: any[] = [];
   let loading = true;
@@ -62,12 +76,26 @@
               <div class="property-info">
                 <span class="label">Lease {i + 1}:</span>
                 <!-- Update to fields that make sense for a lease -->
-                <span class="address">Tenant ID: {lease.tenantId} | Property ID: {lease.propertyId}</span>
+                <span class="address"
+                  >Tenant ID: {lease.tenantId} | Property ID: {lease.propertyId}</span
+                >
               </div>
               <div class="action-buttons">
-                <button class="action-btn" on:click={() => goToEditLease(lease.leaseId)}>Edit Lease</button>
+                <button class="action-btn" on:click={() => goToEditLease(lease.leaseId)}
+                  >Edit Lease</button
+                >
               </div>
             </div>
+            <!-- Lease PDF Upload Form -->
+            <form
+              style="margin: 10px 0 30px 0;"
+              on:submit|preventDefault={async (e) => {
+                await uploadLeasePdf(lease.leaseId, e.target as HTMLFormElement);
+              }}
+            >
+              <input type="file" name="leasePdf" accept="application/pdf" required />
+              <button type="submit">Upload Lease PDF</button>
+            </form>
           {/each}
         </div>
       {:else}
@@ -76,6 +104,8 @@
     </div>
   </section>
 </div>
+
+// http://localhost:5173/leases
 
 <style>
   :global(body) {
@@ -195,6 +225,3 @@
     filter: brightness(1.2);
   }
 </style>
-
-
-// http://localhost:5173/leases

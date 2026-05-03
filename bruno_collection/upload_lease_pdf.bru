@@ -1,0 +1,37 @@
+meta {
+  name: Upload Lease PDF
+  type: http
+  seq: 30
+}
+
+post {
+  url: {{baseUrl}}/leases/{{leaseId}}/pdf
+  body: multipartForm
+}
+
+body:multipart-form {
+  leasePdf: @file({{leasePdfPath}})
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("lease PDF upload should succeed", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("response should include leasePdfUrl", function() {
+    expect(res.body.leasePdfUrl).to.be.a("string");
+    expect(res.body.leasePdfUrl).to.include("/uploads/leases/");
+  });
+
+  test("response should include leasePdfOriginalName", function() {
+    expect(res.body.leasePdfOriginalName).to.be.a("string");
+  });
+
+  test("response should include leasePdfFileSize", function() {
+    expect(res.body.leasePdfFileSize).to.be.a("number");
+  });
+}

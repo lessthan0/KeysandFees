@@ -17,30 +17,41 @@ export enum PropertyStatus {
   VACANT = 'vacant',
   OCCUPIED = 'occupied',
 }
+
 @Entity()
 export class Property {
   @PrimaryColumn({ type: 'varchar' })
-  propertyId: string;
-
-  @Column({ type: 'varchar' })
-  address: string;
+  propertyId!: string;
 
   @BeforeInsert()
   generateId(): void {
     this.propertyId = uuidv7();
   }
 
+  @Column({ type: 'varchar' })
+  address!: string;
+
   @Column({
     type: 'enum',
     enum: PropertyStatus,
-    default: 'vacant',
+    default: PropertyStatus.VACANT,
   })
-  status: PropertyStatus;
-  @Column('int')
-  bedrooms: number;
+  status!: PropertyStatus;
 
-  @Column('int')
-  yearbuilt: number;
+  @Column({ type: 'int' })
+  bedrooms!: number;
+
+  @Column({ type: 'int', default: 1 })
+  bathrooms!: number;
+
+  @Column({ type: 'boolean', default: false })
+  petFriendly!: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  fencedBackyard!: boolean;
+
+  @Column({ type: 'int' })
+  yearbuilt!: number;
 
   @Column({ type: 'int' })
   rentAmount!: number;
