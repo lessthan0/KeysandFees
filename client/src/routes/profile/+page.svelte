@@ -43,7 +43,7 @@
   <section class="bottom-section">
     <div class="profile-content">
       <p class="welcome-text">
-        Welcome {userName} to your Official Profile, here you can view your properties, edit your profile,
+        Welcome {userName} to your Official Profile, here you can view your properties, tenants, and leases, edit your profile,
         and if you choose, Delete your account.
       </p>
 
@@ -53,6 +53,7 @@
         <nav class="profile-links">
           <a href="/properties">View Properties</a>
           <a href="/tenants">View Tenants</a>
+          <a href="/leases">View Leases</a>
           <a href="/edit-profile">Edit Profile</a>
           <a href="/delete-account" class="danger">Delete Account</a>
         </nav>

@@ -46,6 +46,9 @@
   function goToAddTenant() {
     window.location.href = '/add-tenant';
   }
+  function goToAddLease(id: string) {
+    window.location.href = `/add-lease?propertyId=${id}`;
+  }
   function goToEditProperty(id: string) {
     window.location.href = `/edit-property/${id}`;
   }
@@ -76,12 +79,15 @@
                 <span class="address">{property.address}</span>
                 {#if property.imageUrl}
                   <div class="property-image-container">
-                    <img src={property.imageUrl} alt="Property Image" class="property-image" />
+                    <img src={property.imageUrl} alt="Property" class="property-image" />
                   </div>
                 {/if}
               </div>
               <div class="action-buttons">
                 <button class="action-btn" on:click={goToAddTenant}>Add Tenant</button>
+                <button class="action-btn" on:click={() => goToAddLease(property.propertyId)}>
+                  Add Lease
+                </button>
                 <button class="action-btn" on:click={() => goToEditProperty(property.propertyId)}>
                   Edit Property
                 </button>

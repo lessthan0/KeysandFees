@@ -1,5 +1,6 @@
 <script lang="ts">
   import { api } from '$lib/api';
+  import { onMount } from 'svelte';
 
   let tenantId = '';
   let propertyId = '';
@@ -9,6 +10,14 @@
   let depositAmount = '';
 
   let showSuccess = false;
+
+  onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pid = urlParams.get('propertyId');
+    if (pid) {
+      propertyId = pid;
+    }
+  });
 
   async function handleAddLease() {
     const leaseData = {
