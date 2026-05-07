@@ -69,13 +69,19 @@ async function logIn(req: Request, res: Response): Promise<void> {
     };
     req.session.isLoggedIn = true;
 
-    res.sendStatus(200);
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        res.sendStatus(500);
+        return;
+      }
+      res.sendStatus(200);
+    });
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
   }
 }
-
 async function getProfile(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.session.authenticatedUser?.userId;

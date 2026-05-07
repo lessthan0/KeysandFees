@@ -147,9 +147,9 @@ async function updateLease(
   if (data.rentAmount !== undefined) {
     lease.rentAmount = data.rentAmount;
   }
-
   return await LeaseRepository.save(lease);
 }
+
 async function endLeaseForUser(userId: string, leaseId: string): Promise<Lease | null> {
   const lease = await getLeaseForUser(userId, leaseId);
 

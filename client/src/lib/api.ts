@@ -1,15 +1,11 @@
 type JsonBody = Record<string, unknown> | unknown[];
 
-async function request<T = unknown>(
-  method: string,
-  path: string,
-  body?: JsonBody
-): Promise<T> {
+async function request<T = unknown>(method: string, path: string, body?: JsonBody): Promise<T> {
   const res = await fetch(`/api${path}`, {
     method,
-    credentials: 'same-origin',
+    credentials: 'include',
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
-    body: body ? JSON.stringify(body) : undefined
+    body: body ? JSON.stringify(body) : undefined,
   });
 
   if (!res.ok) {
@@ -29,5 +25,5 @@ export const api = {
   post: <T = unknown>(path: string, body?: JsonBody) => request<T>('POST', path, body),
   put: <T = unknown>(path: string, body?: JsonBody) => request<T>('PUT', path, body),
   patch: <T = unknown>(path: string, body?: JsonBody) => request<T>('PATCH', path, body),
-  del: <T = unknown>(path: string) => request<T>('DELETE', path)
+  del: <T = unknown>(path: string) => request<T>('DELETE', path),
 };

@@ -125,7 +125,7 @@ export async function uploadPropertyImage(req: Request, res: Response): Promise<
       return;
     }
 
-    const imageUrl = '/uploads/properties/${req.file.filename}';
+    const imageUrl = '/uploads/photos/${req.file.filename}';
 
     const updatedProperty = await addImageToProperty(
       propertyId,

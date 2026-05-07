@@ -11,17 +11,19 @@ const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'applicatio
 
 const Storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    console.log('Received upload fieldname:', file.fieldname);
     if (file.fieldname === 'leasePdf') {
       cb(null, LEASE_DIR);
       return;
     }
 
-    if (file.fieldname === 'propertyImage') {
+    // Accept 'propertyImg' as the field name for property image uploads
+    if (file.fieldname === 'propertyImg') {
       cb(null, PHOTOS_DIR);
       return;
     }
 
-    cb(new Error('Invalid upload field.'), undefined);
+    cb(new Error('Invalid upload field: ' + file.fieldname), undefined);
   },
 
   filename: (req, file, cb) => {
@@ -61,4 +63,4 @@ const uploadPhoto = multer({
   },
 });
 
-export { Storage, uploadLeaseDoc, uploadPhoto };
+export { uploadLeaseDoc, uploadPhoto };

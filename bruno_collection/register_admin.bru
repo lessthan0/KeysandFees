@@ -12,9 +12,9 @@ post {
 
 body:json {
   {
-    "email": "{{userEmail}}",
-    "password": "{{userPassword}}",
-    "displayName": "Scooter",
+    "email": "greg@xyz.com",
+    "password": "tacopaco",
+    "displayName": "Dan",
     "role": "admin"
   }
 }
@@ -22,4 +22,3 @@ body:json {
 assert {
   res.status: eq 201
 }
-                 

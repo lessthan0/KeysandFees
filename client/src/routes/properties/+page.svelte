@@ -79,6 +79,8 @@
                 <span class="address">{property.address}</span>
                 {#if property.imageUrl}
                   <div class="property-image-container">
+                    <!-- svelte-ignore a11y_img_redundant_alt -->
+                    <img src={property.imageUrl} alt="Property Image" class="property-image" />
                     <img src={property.imageUrl} alt="Property" class="property-image" />
                   </div>
                 {/if}

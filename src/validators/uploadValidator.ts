@@ -11,14 +11,14 @@ const LeaseDocBodySchema = z.object({
 });
 
 const LeaseIdParamsSchema = z.object({
-  leaseId: z.string().uuidv7,
+  leaseId: z.string().uuid(),
 });
 
 const PhotoDocBodySchema = z.object({
   caption: z.string().max(200).optional(),
   originalname: z.string().min(1),
   filename: z.string().min(1),
-  mimetype: z.literal('application/pdf'),
+  mimetype: z.enum(['image/png', 'image/jpeg', 'image/webp']),
   size: z
     .number()
     .positive()

@@ -1,0 +1,29 @@
+meta {
+  name: Login
+  type: https
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "{{userEmail}}",
+    "password": "{{userPassword}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+   test("login sets cookie", function() {
+    expect(res.getHeader("set-cookie")).to.exist
+  })
+}
+​

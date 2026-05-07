@@ -40,9 +40,7 @@ const pgPool = new Pool({
   password: DB_PASSWORD,
   database: DB_NAME,
 
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ...(isProduction ? { ssl: { rejectUnauthorized: false } } : {}),
 });
 
 // Store sessions in PostgreSQL
@@ -58,8 +56,8 @@ const sessionMiddleware = session({
   cookie: {
     maxAge: 8 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: isProduction,
-    sameSite: 'lax',
+    secure: false,
+    sameSite: 'none',
   },
 
   name: 'session',
