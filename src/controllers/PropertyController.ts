@@ -8,7 +8,8 @@ import {
   getPropertyForUser,
   updateProperty,
 } from '../models/PropertyModels.js';
-import { isAdmin } from '../sessionConfig.js';
+
+import { isAdmin } from '../models/UserModel.js';
 
 import { CreatePropertySchema, UpdatePropertySchema } from '../validators/propertyValidators.js';
 

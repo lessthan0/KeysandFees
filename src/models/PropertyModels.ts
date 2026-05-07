@@ -31,7 +31,7 @@ async function getPropertyForUser(
 }
 
 async function getPropertiesForUser(userId: string, isAdmin: boolean = false): Promise<Property[]> {
-  return await PropertyRepository.find({
+  const properties = await PropertyRepository.find({
     where: {
       ...(isAdmin
         ? {}
@@ -40,9 +40,14 @@ async function getPropertiesForUser(userId: string, isAdmin: boolean = false): P
           }),
     },
     relations: {
-      leases: true,
+      leases: {
+        tenant: true,
+      },
     },
   });
+
+  // For each property, find the most recent lease (by startDate) and get its tenantId
+  return properties;
 }
 
 async function addProperty(userId: string, data: CreatePropertyInput): Promise<Property | null> {

@@ -8,7 +8,8 @@
     });
     if (res.ok) {
       alert('Property image uploaded successfully!');
-      properties = await api.get('/properties');
+      const result = await api.get<Property[]>('/properties');
+      properties = result.data;
     } else {
       alert('Failed to upload property image.');
     }
@@ -17,11 +18,27 @@
   import { onMount } from 'svelte';
 
   // Start with an empty array to show the "no properties" view
-  let properties: string | any[] | null | undefined = [];
+  type Property = {
+    propertyId: string;
+    tenantId?: string;
+    [key: string]: any;
+  };
+  let properties: Property[] = [];
 
   onMount(async () => {
     try {
-      properties = await api.get('/properties');
+      const res = await api.get<Property[]>('/properties');
+      properties = res.data;
+      // Check for new tenant assignment in localStorage
+      const assignment = localStorage.getItem('newTenantAssignment');
+      if (assignment) {
+        const { propertyId, tenantId } = JSON.parse(assignment);
+        assignTenantToProperty(propertyId, tenantId);
+        // Clean up
+        localStorage.removeItem('newTenantAssignment');
+        // Auto-redirect to Add Lease for this property/tenant
+        goToAddLease(propertyId, tenantId);
+      }
     } catch (err) {
       console.error('Failed to load properties:', err);
     }
@@ -43,11 +60,28 @@
     window.location.href = `/delete-property/${id}`;
   }
 
-  function goToAddTenant() {
-    window.location.href = '/add-tenant';
+  // Store the propertyId for which we're adding a tenant
+  let propertyIdForTenant: string | null = null;
+
+  function goToAddTenant(propertyId: string) {
+    propertyIdForTenant = propertyId;
+    window.location.href = `/add-tenant?propertyId=${propertyId}`;
   }
-  function goToAddLease(id: string) {
-    window.location.href = `/add-lease?propertyId=${id}`;
+
+  // After adding a tenant, call this to assign the tenantId to the property in local state
+  function assignTenantToProperty(propertyId: string, tenantId: string) {
+    if (!Array.isArray(properties)) return;
+    const prop = properties.find((p: Property) => p.propertyId === propertyId);
+    if (prop) {
+      prop.tenantId = tenantId;
+    }
+  }
+  function goToAddLease(propertyId: string, tenantId?: string) {
+    let url = `/add-lease?propertyId=${propertyId}`;
+    if (tenantId) {
+      url += `&tenantId=${tenantId}`;
+    }
+    window.location.href = url;
   }
   function goToEditProperty(id: string) {
     window.location.href = `/edit-property/${id}`;
@@ -68,7 +102,19 @@
     <div class="list-container">
       <button class="back-link" on:click={goBack}>Back</button>
 
-      <h2 class="section-title">Current Properties</h2>
+      <button class="add-property-btn" on:click={goToAddProperty} style="margin-bottom: 1rem;"
+        >Add Property</button
+      >
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="section-title">Current Properties</h2>
+        <button
+          class="oval-btn primary"
+          style="margin-left: 1rem;"
+          on:click={() => (window.location.href = '/add-lease')}
+        >
+          Add Lease
+        </button>
+      </div>
 
       {#if properties && properties.length > 0}
         <div class="property-list">
@@ -86,9 +132,21 @@
                 {/if}
               </div>
               <div class="action-buttons">
-                <button class="action-btn" on:click={goToAddTenant}>Add Tenant</button>
-                <button class="action-btn" on:click={() => goToAddLease(property.propertyId)}>
+                <button class="action-btn" on:click={() => goToAddTenant(property.propertyId)}>
+                  Add Tenant
+                </button>
+                <button
+                  class="action-btn"
+                  on:click={() => goToAddLease(property.propertyId, property.tenantId ?? undefined)}
+                >
                   Add Lease
+                </button>
+                <button
+                  class="action-btn"
+                  on:click={() =>
+                    (window.location.href = `/leases?propertyId=${property.propertyId}`)}
+                >
+                  View Leases
                 </button>
                 <button class="action-btn" on:click={() => goToEditProperty(property.propertyId)}>
                   Edit Property
@@ -144,7 +202,6 @@
     margin: 0;
     padding: 0;
     background-color: #000;
-    overflow: hidden;
   }
   .landing-page {
     display: flex;

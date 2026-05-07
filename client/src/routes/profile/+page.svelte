@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { api } from '$lib/api';
+  import { onMount } from 'svelte';
 
   // We'll eventually pull the real name from your database/session
   let userName = 'Loading...';
@@ -43,8 +43,8 @@
   <section class="bottom-section">
     <div class="profile-content">
       <p class="welcome-text">
-        Welcome {userName} to your Official Profile, here you can view your properties, tenants, and leases, edit your profile,
-        and if you choose, Delete your account.
+        Welcome {userName} to your Official Profile, here you can view your properties, tenants, and leases,
+        edit your profile, and if you choose, Delete your account.
       </p>
 
       <div class="menu-options">

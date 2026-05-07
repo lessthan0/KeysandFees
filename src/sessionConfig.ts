@@ -1,49 +1,22 @@
 import connectPgSimple from 'connect-pg-simple';
-import { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import { Pool } from 'pg';
-import './config.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
-const cookieSecret = process.env.COOKIE_SECRET;
-
-if (!cookieSecret) {
-  throw new Error('COOKIE_SECRET is missing. Add it to your .env file.');
-}
-
-function requireEnv(name: string): string {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`${name} is missing. Add it to your .env file.`);
-  }
-
-  return value;
-}
-
-const DB_HOST = requireEnv('DB_HOST');
-const DB_PORT = Number(requireEnv('DB_PORT'));
-const DB_USERNAME = requireEnv('DB_USERNAME');
-const DB_PASSWORD = requireEnv('DB_PASSWORD');
-const DB_NAME = requireEnv('DB_NAME');
-
-if (Number.isNaN(DB_PORT)) {
-  throw new Error('DB_PORT must be a valid number.');
-}
 
 const PostgresStore = connectPgSimple(session);
 
-const pgPool = new Pool({
-  host: DB_HOST,
-  port: DB_PORT,
-  user: DB_USERNAME,
-  password: DB_PASSWORD,
-  database: DB_NAME,
+// Store sessions in PostgreSQL
 
-  ...(isProduction ? { ssl: { rejectUnauthorized: false } } : {}),
+const pgPool = new Pool({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: process.env.DB_SSL_MODE === 'require' ? { rejectUnauthorized: false } : false,
 });
 
-// Store sessions in PostgreSQL
 const sessionStorage = new PostgresStore({
   createTableIfMissing: true,
   pool: pgPool,
@@ -51,47 +24,16 @@ const sessionStorage = new PostgresStore({
 
 const sessionMiddleware = session({
   store: sessionStorage,
-  secret: cookieSecret,
-
+  secret: process.env.COOKIE_SECRET, // Signs cookie to prevent forgery
   cookie: {
-    maxAge: 8 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: false,
-    sameSite: 'none',
+    maxAge: 8 * 60 * 60 * 1000, // 8-hour session expiry
+    httpOnly: true, // No client-side JS access (XSS protection)
+    secure: isProduction, // HTTPS only in production
+    sameSite: 'lax', // Basic CSRF protection
   },
-
-  name: 'session',
-  resave: false,
-  saveUninitialized: false,
+  name: 'session', // Cookie name in the browser
+  resave: false, // Skip re-saving unmodified sessions
+  saveUninitialized: false, // Don't save empty sessions (no cookie until session is used)
 });
 
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!req.session.authenticatedUser?.userId) {
-    res.sendStatus(401);
-    return;
-  }
-
-  next();
-}
-
-function requireAdmin(req: Request, res: Response, next: NextFunction): void {
-  const user = req.session.authenticatedUser;
-
-  if (!user) {
-    res.sendStatus(401);
-    return;
-  }
-
-  if (user.role !== 'admin') {
-    res.sendStatus(403);
-    return;
-  }
-
-  next();
-}
-
-function isAdmin(req: Request): boolean {
-  return req.session.authenticatedUser?.role === 'admin';
-}
-
-export { isAdmin, requireAdmin, requireAuth, sessionMiddleware };
+export { sessionMiddleware };

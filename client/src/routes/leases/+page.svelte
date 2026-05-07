@@ -21,8 +21,23 @@
 
   onMount(async () => {
     try {
-      // Adjust endpoint as necessary once backend is ready
-      leases = await api.get('/leases');
+      // Fetch all properties for the user
+      const properties = await api.get<any[]>('/properties');
+      // Fetch leases for each property and flatten the results
+      const allLeases: any[] = [];
+      for (const property of properties) {
+        try {
+          const propertyLeases = await api.get<any[]>(`/properties/${property.propertyId}/leases`);
+          for (const lease of propertyLeases) {
+            // Attach propertyId for display if not present
+            lease.propertyId = property.propertyId;
+            allLeases.push(lease);
+          }
+        } catch (err) {
+          // If a property has no leases or error, skip
+        }
+      }
+      leases = allLeases;
     } catch (err: any) {
       console.error('Failed to fetch leases:', err);
     } finally {

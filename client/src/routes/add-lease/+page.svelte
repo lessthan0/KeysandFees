@@ -17,6 +17,10 @@
     if (pid) {
       propertyId = pid;
     }
+    const tid = urlParams.get('tenantId');
+    if (tid) {
+      tenantId = tid;
+    }
   });
 
   async function handleAddLease() {
@@ -30,7 +34,7 @@
     };
 
     try {
-      await api.post('/leases', leaseData);
+      await api.post(`/properties/${propertyId}/leases`, leaseData);
       showSuccess = true;
     } catch (err: any) {
       console.error('Failed to connect:', err);
@@ -44,7 +48,7 @@
 
   function closeSuccess() {
     showSuccess = false;
-    window.location.href = '/leases'; 
+    window.location.href = '/leases';
   }
 </script>
 
@@ -53,7 +57,8 @@
     <div class="header-content">
       <h1 class="main-title">Landlord APP</h1>
       <div class="logout-container">
-        <button class="logout-btn" on:click={() => window.location.href = '/login'}>Logout</button>
+        <button class="logout-btn" on:click={() => (window.location.href = '/login')}>Logout</button
+        >
       </div>
     </div>
   </header>
@@ -105,6 +110,8 @@
     </div>
   {/if}
 </div>
+
+// http://localhost:5173/add-lease
 
 <style>
   :global(body) {
@@ -216,7 +223,10 @@
   /* Overlay and Success Bubble */
   .overlay {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
@@ -237,5 +247,3 @@
     margin-bottom: 20px;
   }
 </style>
-
-// http://localhost:5173/add-lease

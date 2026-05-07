@@ -1,7 +1,9 @@
+import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import { AppDataSource } from '../dataSource.js';
 import { User, UserRole } from '../entities/User.js';
 import { UpdateProfileSchema } from '../validators/authValidator.js';
+
 const UserRepository = AppDataSource.getRepository(User);
 
 async function getAllUsers(): Promise<User[]> {
@@ -80,6 +82,34 @@ async function deleteUser(userId: string): Promise<boolean> {
   await UserRepository.remove(user);
   return true;
 }
+function requireAuth(req: Request, res: Response, next: NextFunction): void {
+  if (!req.session.authenticatedUser?.userId) {
+    res.sendStatus(401);
+    return;
+  }
+
+  next();
+}
+
+function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+  const user = req.session.authenticatedUser;
+
+  if (!user) {
+    res.sendStatus(401);
+    return;
+  }
+
+  if (user.role !== 'admin') {
+    res.sendStatus(403);
+    return;
+  }
+
+  next();
+}
+
+function isAdmin(req: Request): boolean {
+  return req.session.authenticatedUser?.role === 'admin';
+}
 
 export {
   addUser,
@@ -88,5 +118,8 @@ export {
   getUserByEmail,
   getUserById,
   getUserProfile,
+  isAdmin,
+  requireAdmin,
+  requireAuth,
   updateUserProfile,
 };

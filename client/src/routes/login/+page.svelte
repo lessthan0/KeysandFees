@@ -1,15 +1,35 @@
 <script lang="ts">
   import { api } from '$lib/api';
+  import { auth } from '$lib/auth.svelte';
 
   let email = '';
   let password = '';
 
-  async function handleLogin() {
+  async function handleLogin(): Promise<void> {
+    console.log('LOGIN HANDLER FIRED');
+    console.log('email:', email);
+    console.log('password length:', password.length);
+
     try {
-      await api.post('/login', { email, password });
-      window.location.href = '/profile';
-    } catch (err: any) {
-      alert(`Login failed: ${err.message}`);
+      const res = await api.post('/login', { email, password });
+
+      console.log('LOGIN RESPONSE:', res);
+
+      if (res.ok) {
+        await auth.refresh();
+        window.location.href = '/profile';
+        return;
+      }
+
+      alert(`Login failed. Status: ${res.status}`);
+    } catch (err: unknown) {
+      console.error('LOGIN ERROR:', err);
+
+      if (err instanceof Error) {
+        alert(`Login failed: ${err.message}`);
+      } else {
+        alert('Login failed.');
+      }
     }
   }
 </script>

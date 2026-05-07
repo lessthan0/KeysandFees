@@ -12,7 +12,14 @@
   let showSuccess = false; // The toggle for your green bubble
 
   // 2. Combined functions
+  interface TenantResponse {
+    tenantId: string;
+    [key: string]: any;
+  }
+
   async function handleAddTenant() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const propertyId = urlParams.get('propertyId');
     const tenantData = {
       firstName,
       lastName,
@@ -20,10 +27,21 @@
       phone: phone || undefined,
       maritalStatus: maritalStatus || undefined,
       notes: notes || undefined,
+      propertyId: propertyId || undefined,
     };
 
     try {
-      await api.post('/tenants', tenantData);
+      const newTenant = await api.post<TenantResponse>('/tenants', tenantData);
+      if (propertyId && newTenant && newTenant.data && newTenant.data.tenantId) {
+        // Save to localStorage for properties page to pick up
+        localStorage.setItem(
+          'newTenantAssignment',
+          JSON.stringify({ propertyId, tenantId: newTenant.data.tenantId }),
+        );
+        // Redirect to properties page
+        window.location.href = '/properties';
+        return;
+      }
       showSuccess = true;
     } catch (err: any) {
       console.error('Failed to connect:', err);
@@ -37,7 +55,7 @@
 
   function closeSuccess() {
     showSuccess = false;
-    window.location.href = '/properties'; 
+    window.location.href = '/properties';
   }
 </script>
 
@@ -46,7 +64,8 @@
     <div class="header-content">
       <h1 class="main-title">Landlord APP</h1>
       <div class="logout-container">
-        <button class="logout-btn" on:click={() => window.location.href = '/login'}>Logout</button>
+        <button class="logout-btn" on:click={() => (window.location.href = '/login')}>Logout</button
+        >
       </div>
     </div>
   </header>
@@ -179,7 +198,8 @@
     text-align: right;
     font-size: 1.1rem;
   }
-  input, textarea {
+  input,
+  textarea {
     flex: 1;
     padding: 8px;
     border: 2px solid #1a472a;
@@ -188,7 +208,7 @@
     border-radius: 4px;
     font-family: inherit;
   }
-  
+
   .notes-row {
     align-items: flex-start;
   }

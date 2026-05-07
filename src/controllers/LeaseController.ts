@@ -11,7 +11,8 @@ import {
   getLeasesForUserProperty,
   updateLease,
 } from '../models/LeaseModel.js';
-import { isAdmin } from '../sessionConfig.js';
+
+import { isAdmin } from '../models/UserModel.js';
 import { LeaseIdParamsSchema } from '../validators/uploadValidator.js';
 
 async function listLeasesForProperty(req: Request, res: Response): Promise<void> {

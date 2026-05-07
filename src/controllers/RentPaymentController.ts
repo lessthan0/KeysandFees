@@ -13,7 +13,7 @@ import {
   getPaymentsForLease,
   updateRentPayment,
 } from '../models/RentPaymentModel.js';
-import { isAdmin } from '../sessionConfig.js';
+import { isAdmin } from '../models/UserModel.js';
 
 //export const PaymentRepository = AppDataSource.getRepository(RentPayment);
 

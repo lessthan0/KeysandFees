@@ -1,6 +1,6 @@
 meta {
   name: Login
-  type: https
+  type: http
   seq: 2
 }
 
@@ -22,8 +22,7 @@ assert {
 }
 
 tests {
-   test("login sets cookie", function() {
-    expect(res.getHeader("set-cookie")).to.exist
-  })
+  test("login sets cookie", function() {
+    expect(res.getHeader("set-cookie")).to.exist;
+  });
 }
-​

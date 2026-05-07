@@ -9,7 +9,7 @@ import {
   registerUser,
   updateProfile,
 } from './controllers/UserController.js';
-import { requireAdmin, requireAuth, sessionMiddleware } from './sessionConfig.js';
+import { sessionMiddleware } from './sessionConfig.js';
 import { uploadLeaseDoc, uploadPhoto } from './uploadConfig.js';
 
 import {
@@ -46,6 +46,7 @@ import {
   removeLease,
   uploadLease,
 } from './controllers/LeaseController.js';
+import { requireAdmin, requireAuth } from './models/UserModel.js';
 
 const uploadErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
